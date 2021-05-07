@@ -1,0 +1,4 @@
+libva error: /usr/lib/x86_64-linux-gnu/dri/i965_drv_video.so init failed
+[127189:127189:0422/145626.042803:ERROR:sandbox_linux.cc(374)] InitializeSandbox() called with multiple threads in process gpu-process.
+libva error: /usr/lib/x86_64-linux-gnu/dri/i965_drv_video.so init failed
+[127709:127709:0422/145818.086889:ERROR:sandbox_linux.cc(374)] InitializeSandbox() called with multiple threads in process gpu-process.
