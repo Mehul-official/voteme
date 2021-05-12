@@ -5,6 +5,11 @@ import SideMenu from './SideMenu';
 import Datetime from 'react-datetime';
 import Categories from './Categories';
 import "react-datetime/css/react-datetime.css";
+import file from '../../assets/images/file.svg';
+import piechart from '../../assets/images/pie-chart.png';
+import barchart from '../../assets/images/bar-chart.jpg';
+import linchart from '../../assets/images/lin-chart.jpg';
+import donutchart from '../../assets/images/donut-chart.png';
 
 export default class ListItem extends React.Component {
     constructor() {
@@ -110,7 +115,7 @@ export default class ListItem extends React.Component {
                                                 }
                                                 <div className="browse-img ng-star-inserted">
                                                     <input id="QueryFile" type="file" onChange={this.changeQueryImage} />
-                                                    <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
+                                                    <label><img alt="smile" src={file} /></label>
                                                 </div>
                                                 <textarea placeholder="Write your query here..." formcontrolname="query" className="full-height"></textarea>
                                             </div>
@@ -132,7 +137,7 @@ export default class ListItem extends React.Component {
                                                     }
                                                     <div className="browse-img ng-star-inserted">
                                                         <input id="OptionOneFile" type="file" name={key} onChange={this.changeOptionInfo} />
-                                                        <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
+                                                        <label><img alt="smile" src={file} /></label>
                                                     </div>
                                                     <textarea placeholder={'Option '+alphabetArr[key]+'.'} name={key} className="full-height"  defaultValue={options.value} onChange={this.changeOptionInfo}></textarea>
                                                     {key > 1 && 
@@ -154,28 +159,28 @@ export default class ListItem extends React.Component {
                                             <div className="select-box-inner">
                                                 <input id="pieChart" formcontrolname="chartType" type="radio" value="2" className="ng-untouched ng-pristine ng-valid" />
                                                 <label htmlFor="pieChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/pie-chart.png"} />
+                                                    <img alt="smile" src={piechart} />
                                                     <span>Pie Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
                                                 <input id="barChart" formcontrolname="chartType" type="radio" value="1" className="ng-untouched ng-pristine ng-valid" />
                                                 <label htmlFor="barChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/bar-chart.jpg"} />
+                                                    <img alt="smile" src={barchart} />
                                                     <span>Bar Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
                                                 <input id="lineChart" formcontrolname="chartType" type="radio" value="3" className="ng-untouched ng-pristine ng-valid" />
                                                 <label htmlFor="lineChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/lin-chart.jpg"} />
+                                                    <img alt="smile" src={linchart} />
                                                     <span>Line Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
                                                 <input id="donutChart" formcontrolname="chartType" type="radio" value="4" className="ng-untouched ng-pristine ng-valid" />
                                                 <label htmlFor="donutChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/donut-chart.png"} />
+                                                    <img alt="smile" src={donutchart} />
                                                     <span>Donut Chart</span>
                                                 </label>
                                             </div>

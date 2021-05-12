@@ -3,7 +3,14 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import * as Queries from './../../services/Queries';
 import * as User from '../User/UserDetails';
-
+import uparrowoutline from '../../assets/images/up-arrow-outline.svg';
+import uparrowfill from '../../assets/images/up-arrow-fill.svg';
+import downarrowoutline from '../../assets/images/down-arrow-outline.svg';
+import downarrowfill from '../../assets/images/down-arrow-fill.svg';
+import speechbubbleoutline from '../../assets/images/speech-bubble-outline.svg';
+import viewoutline from '../../assets/images/view-outline.svg';
+import shareoutline from '../../assets/images/share-outline.svg';
+import more from '../../assets/images/more.png';
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
 
@@ -138,24 +145,24 @@ export default class ListItem extends React.Component {
                                 
                                 <div className="bottom-right-options" id={"query_"+Query._id}>
                                     <span className="like ng-star-inserted" onClick={() => this.actionButton(Query._id,'like')}>
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/up-arrow-outline.svg"} className="outline-icon" style={{display : Query.Like === null || Query.Like === false ? 'block' : 'none'}} />
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/up-arrow-fill.svg"} className="fill-icon" style={{display : Query.Like === true ? 'block' : 'none' }}/> {Query.Like} {Query.TotalLikes}
+                                        <img alt="smile" src={uparrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === false ? 'block' : 'none'}} />
+                                        <img alt="smile" src={uparrowfill} className="fill-icon" style={{display : Query.Like === true ? 'block' : 'none' }}/> {Query.Like} {Query.TotalLikes}
                                     </span>
                                     <span className="dislike ng-star-inserted" onClick={() => this.actionButton(Query._id,'dislike')}>
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/down-arrow-outline.svg"} className="outline-icon" style={{display : Query.Like === null || Query.Like === true ? 'block' : 'none'}} /> 
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/down-arrow-fill.svg"} className="fill-icon" style={{display : Query.Like === false ? 'block' : 'none'}} /> {Query.TotalDisLikes}
+                                        <img alt="smile" src={downarrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === true ? 'block' : 'none'}} /> 
+                                        <img alt="smile" src={downarrowfill} className="fill-icon" style={{display : Query.Like === false ? 'block' : 'none'}} /> {Query.TotalDisLikes}
                                     </span>
                                     <span className="comments">
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/speech-bubble-outline.svg"} />{Query.TotalComments}
+                                        <img alt="smile" src={speechbubbleoutline} />{Query.TotalComments}
                                     </span>
                                     <span className="viewers">
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/view-outline.svg"} /> {Query.TotalViews}
+                                        <img alt="smile" src={viewoutline} /> {Query.TotalViews}
                                     </span>
                                     <span className="share">
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/share-outline.svg"} />
+                                        <img alt="smile" src={shareoutline} />
                                     </span>
                                     <span className="more-opt ng-star-inserted" id={"report_"+Query._id}>
-                                        <img alt="smile" src={process.env.REACT_APP_BASE_URL + "src/assets/images/more.png"} />
+                                        <img alt="smile" src={more} />
                                         <div className="report-pop"><a href="#">Report</a></div>
                                     </span>
                                 </div>

@@ -1,13 +1,13 @@
 import React from 'react';
 import Copyright from './Copyright';
-
+import logowhite from '../../assets/images/logo_white.png';
 export default class Header extends React.Component {
     render() {
         return(
             <footer>
                 <div className="footer-inr">
                     <div className="container">
-                        <div className="f-col f-col-1"><img src={process.env.REACT_APP_BASE_URL+"src/assets/images/logo_white.png"} /><span className="f-disc">Solve your any type of queries by asking and also help others by voting their queries.</span></div>
+                        <div className="f-col f-col-1"><img src={logowhite} /><span className="f-disc">Solve your any type of queries by asking and also help others by voting their queries.</span></div>
                         <div className="f-col f-col-2">
                             <h5 className="ftr-title">Quick Links</h5>
                             <ul>

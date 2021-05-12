@@ -4,6 +4,9 @@ import {
     LoginSocialGoogle,
 } from "reactjs-social-login";
 import * as User from '../../services/User';
+import google from '../../assets/images/google.svg';
+import facebook from '../../assets/images/facebook.svg';
+import twitter from '../../assets/images/twitter.svg';
 
 export default class Copyright extends React.Component {
     constructor () {
@@ -55,7 +58,7 @@ export default class Copyright extends React.Component {
                             }}
                             className={'storybook-button storybook-button--primary'}
                         >
-                            <span className="login-with-google"><a><img src={process.env.REACT_APP_BASE_URL+"/src/assets/images/google.svg"} /> Login With Google </a></span>
+                            <span className="login-with-google"><a><img src={google} /> Login With Google </a></span>
                         </LoginSocialGoogle>
                         
                         <LoginSocialFacebook
@@ -68,10 +71,10 @@ export default class Copyright extends React.Component {
                             }}
                             className={'storybook-button storybook-button--primary'}
                         >
-                            <span className="login-with-fb"><a><img src={process.env.REACT_APP_BASE_URL+"/src/assets/images/facebook.svg"} /> Login With Facebook </a></span>
+                            <span className="login-with-fb"><a><img src={facebook} /> Login With Facebook </a></span>
                         </LoginSocialFacebook>
                         <div className="storybook-button storybook-button--primary"> 
-                            <span className="login-with-twitter"><a routerlink="/signin"><img src={process.env.REACT_APP_BASE_URL+"src/assets/images/twitter.svg" } /> Login With Twitter </a></span>
+                            <span className="login-with-twitter"><a routerlink="/signin"><img src={twitter} /> Login With Twitter </a></span>
                         </div>
                     </div>
                 </div>
