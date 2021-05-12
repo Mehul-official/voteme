@@ -3,7 +3,7 @@ import { MyCategories, AllCategories} from './Categories';
 import SideMenu from './SideMenu';
 import ListItem from './ListItem';
 import FilterBy from './FilterBy';
-import * as Queries from './../../services/Queries';
+import * as Queries from '../../services/Queries';
 import * as User from '../User/UserDetails';
 import { Link } from 'react-router-dom';
 
@@ -19,16 +19,16 @@ export default class List extends React.Component {
         super();
         this.state = {
             categories_list : '',
-            choosenCategoriesIds:'',
-            choosenCategories: [],
+            choosenCategories: categories,
+            choosenCategoriesIds : choosen_categories_ids,
             QueriesList : '',
             Page : 1,
             searchBy: 1,
             IsPublic: true,
             CategoryId : choosen_categories_ids.toString(),
             ShortBy : '',
-            TotalRecords : ''
-        }
+            TotalRecords : '',
+        }  
     }
 
     getListItem = (params = '') => {
@@ -58,7 +58,6 @@ export default class List extends React.Component {
     shortItems = (event) => {
         this.getListItem(event);
     }
-
     categoriesModalShow = async () => { 
         await Queries.categories_list().then(
             result => {
@@ -95,14 +94,20 @@ export default class List extends React.Component {
         )
     }
     componentDidMount() {
-        this.setState(prevState => ({
-            choosenCategories: categories,
-            choosenCategoriesIds : choosen_categories_ids,
-        }));
         this.getListItem();
+    }
+    componentDidUpdate(prevProps) {
+        const { filter } = this.props;
+        if (filter != undefined && prevProps.filter !== filter) {
+            
+            this.setState({
+                searchBy:filter
+            }, () => this.getListItem());
+        }
     }
     render() {
         const { categories_list, QueriesList } = this.state;
+        console.log('after QueriesList',QueriesList);
         return(
             <div>
                 <section className="query-banner-img add-cat-page">

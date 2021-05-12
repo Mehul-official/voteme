@@ -26,11 +26,37 @@ function App() {
             {(token !== undefined && token !== '' && token !== false) ? <Home /> : <Redirect to="/login" />}
             <Footer />
           </Route>
+          
           <Route exact path="/queries">
             <Header />
-              {(token !== undefined && token !== '' && token !== false) ? <QueriesList /> : <Redirect to="/login" />}
+              {(token !== undefined && token !== '' && token !== false) ? <QueriesList/> : <Redirect to="/login" />}
             <Footer />
           </Route>
+
+          <Route exact path="/queries/recent">
+            <Header />
+              {(token !== undefined && token !== '' && token !== false) ? <QueriesList filter={2}/> : <Redirect to="/login" />}
+            <Footer />
+          </Route>
+
+          <Route exact path="/queries/top10">
+            <Header />
+              {(token !== undefined && token !== '' && token !== false) ? <QueriesList filter={3}/> : <Redirect to="/login" />}
+            <Footer />
+          </Route>
+
+          <Route exact path="/queries/popular">
+            <Header />
+              {(token !== undefined && token !== '' && token !== false) ? <QueriesList filter={4} /> : <Redirect to="/login" />}
+            <Footer />
+          </Route>
+
+          <Route exact path="/queries/general">
+            <Header />
+              {(token !== undefined && token !== '' && token !== false) ? <QueriesList filter={1}/> : <Redirect to="/login" />}
+            <Footer />
+          </Route>
+
           <Route exact path="/add-query">
             <Header />
               {(token !== undefined && token !== '' && token !== false) ? <AddQuery /> : <Redirect to="/login" />}

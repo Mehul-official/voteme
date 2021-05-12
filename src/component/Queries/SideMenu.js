@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default class SideMenu extends React.Component {
     constructor() {
@@ -22,52 +23,52 @@ export default class SideMenu extends React.Component {
                 <div className="sidebar-inner">
                     <ul>
                         <li className="menu-items active">
-                            <a routerlink="/queries" href="/queries">
+                            <Link to="/queries">
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/home.svg'} className="sidebar-icon" />
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/hover-home.svg'} className="sidebar-icon hover-icon" /> Home
-                            </a>
+                            </Link>
                         </li>
                         <li id="Queries" className="menu-items">
-                            <a onClick={() => this.toggleSubmenu('queries-submenu')}>
+                            <Link onClick={() => this.toggleSubmenu('queries-submenu')}>
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/question-mark.svg'} className="sidebar-icon" />
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/hover-question-mark.svg'} className="sidebar-icon hover-icon" /> Queries
-                            </a>
+                            </Link>
                             <ul className="sidebar-submenu ng-star-inserted queries-submenu" style={{display : this.state.submenuIsActive && this.state.submenu == 'queries-submenu' ? 'block' : 'none'}}>
-                                <li><a href="/queries/recent">Recent Queries</a></li>
-                                <li><a href="/queries/top10">Top 10 Queries</a></li>
-                                <li><a href="/queries/popular">Popular Queries</a></li>
-                                <li><a href="/queries/general">All Queries</a></li>
+                                <li><Link to="/queries/recent">Recent Queries</Link></li>
+                                <li><Link to="/queries/top10">Top 10 Queries</Link></li>
+                                <li><Link to="/queries/popular">Popular Queries</Link></li>
+                                <li><Link to="/queries/general">All Queries</Link></li>
                             </ul>
                         </li>
                         <li className="menu-items">
-                            <a href="/my-query">
+                            <Link to="/my-query">
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/question-mark.svg'} className="sidebar-icon" />
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/hover-question-mark.svg'} className="sidebar-icon hover-icon" /> My Queries
-                            </a>
+                            </Link>
                         </li>
                         <li className="menu-items">
-                            <a href="/profile">
+                            <Link to="/profile">
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/man-user.svg'} className="sidebar-icon" />
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/hover-man-user.svg'} className="sidebar-icon hover-icon" /> My Profile
-                            </a>
+                            </Link>
                         </li>
                         <li className="menu-items">
-                            <a href="/terms-and-condition">
+                            <Link to="/terms-and-condition">
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/term-condition.svg'} className="sidebar-icon" />
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/hover-term-condition.svg'} className="sidebar-icon hover-icon" /> Terms &amp; Conditions
-                            </a>
+                            </Link>
                         </li>
                         <li className="menu-items">
-                            <a href="/help">
+                            <Link to="/help">
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/help.svg'} className="sidebar-icon" />
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/hover-help.svg'} className="sidebar-icon hover-icon" /> Help
-                            </a>
+                            </Link>
                         </li>
                         <li className="menu-items">
-                            <a style={{cursor: 'pointer'}} href="/queries">
+                            <Link to="/queries" style={{cursor: 'pointer'}}>
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/logout.svg'} className="sidebar-icon" />
                                 <img src={process.env.REACT_APP_BASE_URL + '/src/assets/images/hover-logout.svg'} className="sidebar-icon hover-icon" /> Logout
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>
