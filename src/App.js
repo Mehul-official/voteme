@@ -29,7 +29,7 @@ function App() {
           
           <Route exact path="/queries">
             <Header />
-              {(token !== undefined && token !== '' && token !== false) ? <QueriesList/> : <Redirect to="/login" />}
+              {(token !== undefined && token !== '' && token !== false) ? <QueriesList filter={1}/> : <Redirect to="/login" />}
             <Footer />
           </Route>
 

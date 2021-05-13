@@ -1,7 +1,7 @@
 import React from 'react';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import * as Queries from './../../services/Queries';
+import * as Queries from '../../services/Queries';
 import * as User from '../User/UserDetails';
 
 const userDetails = User.userDetails;

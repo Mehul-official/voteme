@@ -99,7 +99,6 @@ export default class List extends React.Component {
     componentDidUpdate(prevProps) {
         const { filter } = this.props;
         if (filter != undefined && prevProps.filter !== filter) {
-            
             this.setState({
                 searchBy:filter
             }, () => this.getListItem());
@@ -107,7 +106,6 @@ export default class List extends React.Component {
     }
     render() {
         const { categories_list, QueriesList } = this.state;
-        console.log('after QueriesList',QueriesList);
         return(
             <div>
                 <section className="query-banner-img add-cat-page">
@@ -133,7 +131,7 @@ export default class List extends React.Component {
                                     </div>
                                     <div>
                                         <div className="tab-content-list queries-list">
-                                            <ListItem QueriesList={QueriesList} userId={user_id}/>
+                                           <ListItem QueriesList={QueriesList} userId={user_id}/>
                                         </div>
                                     </div>
                                 </div>
