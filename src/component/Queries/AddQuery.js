@@ -1,20 +1,16 @@
 import React from 'react';
-import * as Queries from './../../services/Queries';
+import * as Queries from '../../services/Queries';
 import * as User from '../User/UserDetails';
 import SideMenu from './SideMenu';
 import Datetime from 'react-datetime';
-import Categories from './Categories';
+import { AllCategories } from './Categories';
 import "react-datetime/css/react-datetime.css";
-import file from '../../assets/images/file.svg';
-import piechart from '../../assets/images/pie-chart.png';
-import barchart from '../../assets/images/bar-chart.jpg';
-import linchart from '../../assets/images/lin-chart.jpg';
-import donutchart from '../../assets/images/donut-chart.png';
 
 export default class ListItem extends React.Component {
     constructor() {
         super();
         this.state = {
+            categories_list: '',
             queryImageUrl : '',
             options : [
                 {
@@ -61,17 +57,17 @@ export default class ListItem extends React.Component {
         });
     }
     changeOptionInfo = (event) => {
-        event.preventDefault();
-        const { options } = this.state;
-        const { defaultValue, type, name, id, value, files } = event.target;
-
+        let { options } = this.state;
+        const { defaultValue, type, name, id, value, className, files } = event.target;
+        
         if (type == 'file') {
             options[name]['optionImage'] = files;            
         } else {
             options[name]['value'] = value;
         }
+        
         this.setState({
-            options : options
+            options : options,
         });   
     }
     removeOptions = (key) => {
@@ -83,6 +79,15 @@ export default class ListItem extends React.Component {
         this.setState({
             options : resetOptions
         });
+    }
+    componentDidMount () {
+        Queries.categories_list().then(
+            result => {
+                this.setState({
+                    categories_list: result.Data
+                });
+            }
+        )
     }
     render() {
         const { queryImageUrl, options } = this.state;
@@ -115,7 +120,7 @@ export default class ListItem extends React.Component {
                                                 }
                                                 <div className="browse-img ng-star-inserted">
                                                     <input id="QueryFile" type="file" onChange={this.changeQueryImage} />
-                                                    <label><img alt="smile" src={file} /></label>
+                                                    <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
                                                 </div>
                                                 <textarea placeholder="Write your query here..." formcontrolname="query" className="full-height"></textarea>
                                             </div>
@@ -137,7 +142,7 @@ export default class ListItem extends React.Component {
                                                     }
                                                     <div className="browse-img ng-star-inserted">
                                                         <input id="OptionOneFile" type="file" name={key} onChange={this.changeOptionInfo} />
-                                                        <label><img alt="smile" src={file} /></label>
+                                                        <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
                                                     </div>
                                                     <textarea placeholder={'Option '+alphabetArr[key]+'.'} name={key} className="full-height"  defaultValue={options.value} onChange={this.changeOptionInfo}></textarea>
                                                     {key > 1 && 
@@ -157,30 +162,30 @@ export default class ListItem extends React.Component {
                                         <div className="section-title">Representation of your Result</div>
                                         <div className="custom-select-box">
                                             <div className="select-box-inner">
-                                                <input id="pieChart" formcontrolname="chartType" type="radio" value="2" className="ng-untouched ng-pristine ng-valid" />
+                                                <input id="pieChart" formcontrolname="chartType" name="chartType" type="radio" value="2" className="chartType" defaultChecked/>
                                                 <label htmlFor="pieChart">
-                                                    <img alt="smile" src={piechart} />
+                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/pie-chart.png"} />
                                                     <span>Pie Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
-                                                <input id="barChart" formcontrolname="chartType" type="radio" value="1" className="ng-untouched ng-pristine ng-valid" />
+                                                <input id="barChart" formcontrolname="chartType" name="chartType" type="radio" value="1" className="chartType" />
                                                 <label htmlFor="barChart">
-                                                    <img alt="smile" src={barchart} />
+                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/bar-chart.jpg"} />
                                                     <span>Bar Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
-                                                <input id="lineChart" formcontrolname="chartType" type="radio" value="3" className="ng-untouched ng-pristine ng-valid" />
+                                                <input id="lineChart" formcontrolname="chartType" name="chartType" type="radio" value="3" className="chartType" />
                                                 <label htmlFor="lineChart">
-                                                    <img alt="smile" src={linchart} />
+                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/lin-chart.jpg"} />
                                                     <span>Line Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
-                                                <input id="donutChart" formcontrolname="chartType" type="radio" value="4" className="ng-untouched ng-pristine ng-valid" />
+                                                <input id="donutChart" formcontrolname="chartType" name="chartType" type="radio" value="4" className="chartType" />
                                                 <label htmlFor="donutChart">
-                                                    <img alt="smile" src={donutchart} />
+                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/donut-chart.png"} />
                                                     <span>Donut Chart</span>
                                                 </label>
                                             </div>
@@ -190,10 +195,10 @@ export default class ListItem extends React.Component {
                                         <div className="ask-query-inner flex-box">
                                             <h2 className="section-title">Share your query with</h2>
                                             <div className="query-type-radio">
-                                                <span className="public"><input type="radio" formcontrolname="isPublic" value="true" className="ng-untouched ng-pristine ng-valid" />
+                                                <span className="public"><input type="radio" name="isPublic" formcontrolname="isPublic" value="true" className="isPublic" defaultChecked/>
                                                     <label htmlFor="public"><i aria-hidden="true" className="fa fa-users"></i> Public </label>
                                                 </span>
-                                                <span className="private"><input type="radio" formcontrolname="isPublic" value="false" className="ng-untouched ng-pristine ng-valid" />
+                                                <span className="private"><input type="radio" name="isPublic" formcontrolname="isPublic" value="false" className="isPublic" />
                                                     <label htmlFor="private"><i aria-hidden="true" className="fa fa-user"></i> Private </label>
                                                 </span>
                                             </div>
@@ -213,10 +218,8 @@ export default class ListItem extends React.Component {
                                     </div>
                                     <div id="select-category" className="select-category">
                                         <h2 className="section-title">Select Categories</h2>
-                                        <div className="category-cover ng-star-inserted">
-                                            <div className="category-list ng-star-inserted" style={{backgroundImage: 'url(&quot;https://voteme-development-categories.s3.ap-south-1.amazonaws.com/thumbnailInnovations.jpg&quot;)'}}>
-                                                <input type="checkbox" value="5e96ad1c5a89d0699c839fbe" className="ng-star-inserted" /><label><span>Category One</span></label>
-                                            </div>
+                                        <div className="five-grid">
+                                            <AllCategories categoriesList={this.state.categories_list}/>
                                         </div>
                                     </div>
                                     <div className="submit-btn">

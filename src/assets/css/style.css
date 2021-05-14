@@ -1209,6 +1209,10 @@ footer {
     border-radius: 10px;
     overflow: hidden;
 }
+.five-grid .category-list {
+    width: calc(18% - 14px);
+    height: 106px;
+}
 .category-list::before {
     content: "";
     position: absolute;

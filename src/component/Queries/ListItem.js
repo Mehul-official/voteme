@@ -34,11 +34,12 @@ export default class ListItem extends React.Component {
         }));
     }
     componentDidMount() {
-        setTimeout(() => {
+        // setTimeout(() => {
             this.setState({
+                TotalRecords : this.props.QueriesList.length,
                 QueriesList : this.props.QueriesList.slice(0, 10),
             });
-        }, 1000);
+        // }, 1000);
     }
     toggleCatList = (_id) => {
         if (this.state.listCategoryShow === _id) {
@@ -84,13 +85,14 @@ export default class ListItem extends React.Component {
     }
     render() {
         const { Page, TotalRecords, QueriesList } = this.state;
+        console.log('state',this.state);
         return(
             <div className="ng-star-inserted" id="querylist">
                 <InfiniteScroll
-                dataLength={this.props.QueriesList.length}
+                dataLength={this.state.QueriesList.length}
                 next={this.fetchMoreData}
                 refreshFunction={this.fetchMoreData}
-                hasMore={true}
+                hasMore={this.state.end < this.props.QueriesList.length && true}
                 scrollableTarget="scrollableDiv"
                 loader={<h4>Loading...</h4>}
                 >

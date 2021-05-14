@@ -1,5 +1,5 @@
 import React from 'react';
-import * as Queries from './../../services/Queries';
+import * as Queries from '../../services/Queries';
 
 const userDetails = (localStorage.userDetails) ? JSON.parse(localStorage.userDetails) : '';
 let categories = userDetails != '' && userDetails.Data.user.Category;
@@ -49,16 +49,18 @@ export class AllCategories extends React.Component {
     constructor(props) {
         super();
         this.state = {
-            error: null,
-            categories_list : null,
+            categories_list : '',
             isLoaded: false,
         }
     }
-    componentDidMount() {
-        this.setState({
-            categories_list : categories,
-            isLoaded: true
-        });
+    componentDidUpdate(prevProps) {
+        const { categoriesList } = this.props;
+        if (categoriesList != undefined && prevProps.categoriesList !== categoriesList) {
+            this.setState({
+                categories_list : categoriesList,
+                isLoaded: true
+            })
+        }
     }
     render() {
         const { categories_list, isLoaded } = this.state;
@@ -66,20 +68,13 @@ export class AllCategories extends React.Component {
             return <div>Loading...</div>;
         } else {
             return(
-                <div className="categories-blocks">
-                    <div className="categories-added-list container">
-                        <div className="d-flex">
-                            
-                        {categories_list != null && categories_list.map((categories, key) => (
-                            <div key={key} className="header-cat-list ng-star-inserted" style={{backgroundImage: "url('"+categories.ThumbnailURL+"')"}}>
-                                <div className="ng-star-inserted"><span className="cat-title">{categories.CategoryName}</span></div>
-                            </div>
-                        ))}
+                <div className="category-cover">
+                    {categories_list !== '' && categories_list.map((category, key) => (
+                        <div key={key} value={category._id} className="category-list ng-star-inserted" style={{backgroundImage: 'url("'+category.ThumbnailURL+'")'}}>
+                            <input type="checkbox" checked={category.checked && category.checked === true && 'checked'} value={category._id} onChange={this.selectCategories}/>
+                            <label><span>{category.CategoryName}</span></label>
                         </div>
-                        <div className="header-cat-list add-cat-btn ng-star-inserted">
-                            <button type="button" onClick={this.props.addMore}><span>+</span>Add More</button>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             )
         }

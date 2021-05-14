@@ -1,5 +1,5 @@
 import React from 'react';
-import { MyCategories, AllCategories} from './Categories';
+import { MyCategories, AllCategories } from './Categories';
 import SideMenu from './SideMenu';
 import ListItem from './ListItem';
 import FilterBy from './FilterBy';
@@ -15,15 +15,16 @@ let categories = userDetails !== '' && userDetails.Category;
 let choosen_categories_ids = categories !== false && categories.map(el => el._id);
 
 export default class List extends React.Component {
-    constructor() {
+    constructor(props) {
         super();
         this.state = {
+            isLoaded : false,
             categories_list : '',
             choosenCategories: categories,
             choosenCategoriesIds : choosen_categories_ids,
             QueriesList : '',
             Page : 1,
-            searchBy: 1,
+            searchBy: props.filter,
             IsPublic: true,
             CategoryId : choosen_categories_ids.toString(),
             ShortBy : '',
@@ -42,11 +43,13 @@ export default class List extends React.Component {
         if (params !== '' && params.target.value !== '') {
             queryParams[params.target.value] = true;
         }
+        console.log('queryParams',queryParams)
         var queryParams = Object.keys(queryParams).reduce(function(a,k){a.push(k+'='+encodeURIComponent(queryParams[k]));return a},[]).join('&');
         Queries.get_query(queryParams).then(
             result => {
                 if (result.Status === "Success") {
                     this.setState({
+                        isLoaded : true,
                         QueriesList : result.Data[0].Records,
                         Page : (result.Data[0].Summary.length > 0 && result.Data[0].Summary[0].Page) ? result.Data[0].Summary[0].Page : 1,
                         TotalRecords : (result.Data[0].Summary.length > 0 && result.Data[0].Summary[0].TotalRecords) ? result.Data[0].Summary[0].TotalRecords : 0,
@@ -56,6 +59,9 @@ export default class List extends React.Component {
         )
     }
     shortItems = (event) => {
+        this.setState({
+            isLoaded : false
+        })
         this.getListItem(event);
     }
     categoriesModalShow = async () => { 
@@ -65,7 +71,7 @@ export default class List extends React.Component {
                     if (choosen_categories_ids.includes(category['_id']) === true) {
                         category['checked'] = true;
                     }
-                })
+                });
                 this.setState({
                     categories_list: result.Data
                 });
@@ -100,12 +106,14 @@ export default class List extends React.Component {
         const { filter } = this.props;
         if (filter != undefined && prevProps.filter !== filter) {
             this.setState({
-                searchBy:filter
-            }, () => this.getListItem());
+                searchBy:filter,
+                isLoaded : false,
+            }, () => this.getListItem())
         }
+        return false;
     }
     render() {
-        const { categories_list, QueriesList } = this.state;
+        const { categories_list, QueriesList, isLoaded } = this.state;
         return(
             <div>
                 <section className="query-banner-img add-cat-page">
@@ -131,7 +139,7 @@ export default class List extends React.Component {
                                     </div>
                                     <div>
                                         <div className="tab-content-list queries-list">
-                                           <ListItem QueriesList={QueriesList} userId={user_id}/>
+                                            {(!isLoaded) ? <div>Loading...</div> : <ListItem QueriesList={QueriesList} userId={user_id}/>}
                                         </div>
                                     </div>
                                 </div>
@@ -148,13 +156,8 @@ export default class List extends React.Component {
                                 <div className="select-cat-inner">
                                     <div className="select-category">
                                         <h2 className="section-title">What are your interests?</h2>
-                                        <div className="category-cover">
-                                            {categories_list !== '' && categories_list.map((category, key) => (
-                                                <div key={key} value={category._id} className="category-list ng-star-inserted" style={{backgroundImage: 'url("'+category.ThumbnailURL+'")'}}>
-                                                    <input type="checkbox" checked={category.checked && category.checked === true && 'checked'} value={category._id} onChange={this.selectCategories}/>
-                                                    <label><span>{category.CategoryName}</span></label>
-                                                </div>
-                                            ))}
+                                        <div className="four-grid">
+                                            <AllCategories categoriesList={this.state.categories_list} />
                                         </div>
                                     </div>
                                     <div className="submit-btn center-text"><button type="button" onClick={this.updateCategories}>Save</button></div>
@@ -168,3 +171,4 @@ export default class List extends React.Component {
         )
     }
 }
+
