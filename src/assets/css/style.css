@@ -1056,6 +1056,7 @@ footer {
 }*/
 .select-query-type-block {
     margin-bottom: 30px;
+    position: relative;
 }
 .option-textarea {
     display: flex;
@@ -2663,11 +2664,17 @@ footer {
     color: #0071bc;
 }
 .validation-msg {
+    text-align: right;
+    width: 100%;
+    bottom: -25px;
     display: block;
     position: absolute;
     color: #f00;
     font-size: 12px;
     margin-top: 2px;
+}
+.cross-validation-error {
+    border-bottom: 3px solid red!important;
 }
 .add-more-info .form-field.validation-error {
     margin-bottom: 35px;

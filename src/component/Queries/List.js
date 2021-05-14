@@ -40,10 +40,14 @@ export default class List extends React.Component {
             IsPublic : this.state.IsPublic,
             searchBy : this.state.searchBy
         };
-        if (params !== '' && params.target.value !== '') {
-            queryParams[params.target.value] = true;
+        if (params.target && params.target.length) {
+            if (params !== '' && params.target.value !== '') {
+                queryParams[params.target.value] = true;
+            }           
+        } else if (params.PageNo && params.PageNo !== '') {
+            queryParams.PageNo = params.PageNo;
         }
-        console.log('queryParams',queryParams)
+ 
         var queryParams = Object.keys(queryParams).reduce(function(a,k){a.push(k+'='+encodeURIComponent(queryParams[k]));return a},[]).join('&');
         Queries.get_query(queryParams).then(
             result => {
@@ -139,7 +143,7 @@ export default class List extends React.Component {
                                     </div>
                                     <div>
                                         <div className="tab-content-list queries-list">
-                                            {(!isLoaded) ? <div>Loading...</div> : <ListItem QueriesList={QueriesList} userId={user_id}/>}
+                                            {(!isLoaded) ? <div>Loading...</div> : <ListItem QueriesList={QueriesList} userId={user_id} PageNo={this.getListItem}/>}
                                         </div>
                                     </div>
                                 </div>

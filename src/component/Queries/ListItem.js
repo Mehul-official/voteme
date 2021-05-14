@@ -31,7 +31,9 @@ export default class ListItem extends React.Component {
             QueriesList : [...prevState.QueriesList, ...this.props.QueriesList.slice(this.state.start, this.state.end)],
             start : this.state.start+10,
             end : this.state.end+10,
+            Page : this.state.Page+1
         }));
+        this.props.PageNo({PageNo:this.state.Page})
     }
     componentDidMount() {
         // setTimeout(() => {

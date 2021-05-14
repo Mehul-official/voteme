@@ -10,6 +10,7 @@ export default class ListItem extends React.Component {
     constructor() {
         super();
         this.state = {
+            query:'',
             categories_list: '',
             queryImageUrl : '',
             options : [
@@ -21,7 +22,11 @@ export default class ListItem extends React.Component {
                     value : '',
                     optionImage : ''
                 }
-            ]
+            ],
+            errors: {
+                query : '',
+                options : [],
+            }
         }
         this.addMoreOption = this.addMoreOption.bind(this);
     }
@@ -57,19 +62,46 @@ export default class ListItem extends React.Component {
         });
     }
     changeOptionInfo = (event) => {
-        let { options } = this.state;
+        event.preventDefault();
+        let { options, errors } = this.state;
         const { defaultValue, type, name, id, value, className, files } = event.target;
         
         if (type == 'file') {
             options[name]['optionImage'] = files;            
         } else {
             options[name]['value'] = value;
+            if (value == '') {
+                errors.options[name] = 'is required*';
+            } else {
+                errors.options[name] = null;
+            }
         }
         
         this.setState({
+            [name]: value,
             options : options,
-        });   
+        });
     }
+    handleChange = (event) => {
+        event.preventDefault();
+        let { options, errors } = this.state;
+        const { type, name, id, value, className } = event.target;
+        switch (name) {
+            case 'query': 
+                if (value == '') {
+                    errors.query = 'Query is required*';
+                } else {
+                    errors.query = null;
+                }
+                break;
+            default:
+                break;
+        }
+        this.setState({
+            [name]: value
+        });
+    }
+    
     removeOptions = (key) => {
         const { options } = this.state;
         delete options[key];
@@ -90,7 +122,8 @@ export default class ListItem extends React.Component {
         )
     }
     render() {
-        const { queryImageUrl, options } = this.state;
+        const { queryImageUrl, options, errors } = this.state;
+        console.log('errors',errors);
         const alphabetArr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
         return(
             <section className="query-banner-img">
@@ -102,7 +135,7 @@ export default class ListItem extends React.Component {
                                 <h1 className="page-title">Query Of The Day</h1>
                             </div>
                             <div className="right-container-inner">
-                                <form noValidate="" className="ng-untouched ng-pristine ng-invalid">
+                                <form className="">
                                     <div className="profile-info">
                                         <span className="profile-img ng-star-inserted" style={{backgroundImage: 'url("'+User.UserImage+'")'}}></span>
                                         <span className="general-title">{User.userDetails.FirstName} {User.userDetails.LastName}</span>
@@ -118,13 +151,14 @@ export default class ListItem extends React.Component {
                                                         </div>
                                                     </div>
                                                 }
-                                                <div className="browse-img ng-star-inserted">
+                                                <div className={(errors.query != null && errors.query.length > 0 && "cross-validation-error") + " browse-img"}>
                                                     <input id="QueryFile" type="file" onChange={this.changeQueryImage} />
                                                     <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
                                                 </div>
-                                                <textarea placeholder="Write your query here..." formcontrolname="query" className="full-height"></textarea>
+                                                <textarea placeholder="Write your query here..." formcontrolname="query" name="query" className="full-height" defaultValue={this.state.query} onChange={this.handleChange}></textarea>
                                             </div>
                                         </div>
+                                        {(errors.query != null && errors.query.length > 0) && <span className='validation-msg'>{errors.query}</span>}
                                     </div>
                                     <div className="select-query-type-block">
                                         <div className="select-option-title">Add Options</div>
@@ -140,7 +174,7 @@ export default class ListItem extends React.Component {
                                                             </div>
                                                         </div>
                                                     }
-                                                    <div className="browse-img ng-star-inserted">
+                                                    <div className={(errors.options[key] != null && errors.options[key].length > 0 && "cross-validation-error") + " browse-img"} >
                                                         <input id="OptionOneFile" type="file" name={key} onChange={this.changeOptionInfo} />
                                                         <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
                                                     </div>
@@ -151,6 +185,7 @@ export default class ListItem extends React.Component {
                                                         </div>
                                                     }
                                                 </div>
+                                                {(errors.options[key] != null && errors.options[key].length > 0) && <span className='validation-msg'>{ 'Option ' + alphabetArr[key] } { errors.options[key] }</span>}
                                             </div>
                                             ))}
                                             {options.length < 6 && 
@@ -223,13 +258,14 @@ export default class ListItem extends React.Component {
                                         </div>
                                     </div>
                                     <div className="submit-btn">
-                                        <button type="submit">Submit</button>
+                                        <button type="submit" onClick={this.handleChange}>Submit</button>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
+                
             </section>
         )
     }
