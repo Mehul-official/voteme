@@ -31,9 +31,11 @@ export default class ListItem extends React.Component {
             QueriesList : [...prevState.QueriesList, ...this.props.QueriesList.slice(this.state.start, this.state.end)],
             start : this.state.start+10,
             end : this.state.end+10,
-            Page : this.state.Page+1
+            Page : this.state.Page
         }));
-        this.props.PageNo({PageNo:this.state.Page})
+        if (this.state.end === this.props.QueriesList.length) {
+            this.props.PageNo({PageNo:this.state.Page+1})
+        }
     }
     componentDidMount() {
         // setTimeout(() => {
@@ -87,14 +89,13 @@ export default class ListItem extends React.Component {
     }
     render() {
         const { Page, TotalRecords, QueriesList } = this.state;
-        console.log('state',this.state);
         return(
             <div className="ng-star-inserted" id="querylist">
                 <InfiniteScroll
                 dataLength={this.state.QueriesList.length}
                 next={this.fetchMoreData}
                 refreshFunction={this.fetchMoreData}
-                hasMore={this.state.end < this.props.QueriesList.length && true}
+                hasMore={(this.state.end < this.props.TotalRecords) ? true : false}
                 scrollableTarget="scrollableDiv"
                 loader={<h4>Loading...</h4>}
                 >

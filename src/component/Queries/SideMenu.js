@@ -16,11 +16,11 @@ import hoverlogout from '../../assets/images/hover-logout.svg';
 
 
 export default class SideMenu extends React.Component {
-    constructor() {
+    constructor(props) {
         super();
         this.state = {
-            submenu : '',
-            submenuIsActive : ''
+            submenu : (props.filter && props.filter !== '' && 'queries-submenu'),
+            submenuIsActive : (props.filter && props.filter !== '' && true)
         }
     }
     toggleSubmenu(subMenuClass) {
@@ -32,35 +32,36 @@ export default class SideMenu extends React.Component {
     }
 
     render() {
+        const { filter, component } = this.props;
         return(
             <div className="left-sidebar">
                 <div className="sidebar-inner">
                     <ul>
-                        <li className="menu-items active">
+                        <li className={'menu-items ' + (component === 'home' && 'active')}>
                             <Link to="/queries">
                                 <img src={home.svg} className="sidebar-icon" />
                                 <img src={hoverhome.svg} className="sidebar-icon hover-icon" /> Home
                             </Link>
                         </li>
-                        <li id="Queries" className="menu-items">
+                        <li id="Queries" className={'menu-items ' + (component === 'querylist' && 'active')}>
                             <Link onClick={() => this.toggleSubmenu('queries-submenu')}>
                                 <img src={questionmark} className="sidebar-icon" />
                                 <img src={hoverquestionmark} className="sidebar-icon hover-icon" /> Queries
                             </Link>
                             <ul className="sidebar-submenu ng-star-inserted queries-submenu" style={{display : this.state.submenuIsActive && this.state.submenu == 'queries-submenu' ? 'block' : 'none'}}>
-                                <li><Link to="/queries/recent">Recent Queries</Link></li>
-                                <li><Link to="/queries/top10">Top 10 Queries</Link></li>
-                                <li><Link to="/queries/popular">Popular Queries</Link></li>
-                                <li><Link to="/queries/general">All Queries</Link></li>
+                                <li className={filter === 2 && 'active'}><Link to="/queries/recent">Recent Queries</Link></li>
+                                <li className={filter === 3 && 'active'}><Link to="/queries/top10">Top 10 Queries</Link></li>
+                                <li className={filter === 4 && 'active'}><Link to="/queries/popular">Popular Queries</Link></li>
+                                <li className={filter === 1 && 'active'}><Link to="/queries/general">All Queries</Link></li>
                             </ul>
                         </li>
-                        <li className="menu-items">
+                        <li className={'menu-items ' + (component === 'myquery' && 'active')}>
                             <Link to="/my-query">
                                 <img src={questionmark} className="sidebar-icon" />
                                 <img src={hoverquestionmark} className="sidebar-icon hover-icon" /> My Queries
                             </Link>
                         </li>
-                        <li className="menu-items">
+                        <li className={'menu-items ' + (component === 'profile' && 'active')}>
                             <Link to="/profile">
                                 <img src={manuser} className="sidebar-icon" />
                                 <img src={hovermanuser} className="sidebar-icon hover-icon" /> My Profile

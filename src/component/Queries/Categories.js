@@ -71,7 +71,7 @@ export class AllCategories extends React.Component {
                 <div className="category-cover">
                     {categories_list !== '' && categories_list.map((category, key) => (
                         <div key={key} value={category._id} className="category-list ng-star-inserted" style={{backgroundImage: 'url("'+category.ThumbnailURL+'")'}}>
-                            <input type="checkbox" checked={category.checked && category.checked === true && 'checked'} value={category._id} onChange={this.selectCategories}/>
+                            <input type="checkbox" name='selectCategory' checked={category.checked && category.checked === true && 'checked'} value={category._id} onChange={this.props.selectCategories} defaultChecked={false}/>
                             <label><span>{category.CategoryName}</span></label>
                         </div>
                     ))}

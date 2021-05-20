@@ -52,12 +52,12 @@ export default class List extends React.Component {
         Queries.get_query(queryParams).then(
             result => {
                 if (result.Status === "Success") {
-                    this.setState({
+                    this.setState(prevState => ({
                         isLoaded : true,
-                        QueriesList : result.Data[0].Records,
+                        QueriesList : [...prevState.QueriesList, ...result.Data[0].Records],
                         Page : (result.Data[0].Summary.length > 0 && result.Data[0].Summary[0].Page) ? result.Data[0].Summary[0].Page : 1,
                         TotalRecords : (result.Data[0].Summary.length > 0 && result.Data[0].Summary[0].TotalRecords) ? result.Data[0].Summary[0].TotalRecords : 0,
-                    });
+                    }));
                 }
             }
         )
@@ -110,21 +110,21 @@ export default class List extends React.Component {
         const { filter } = this.props;
         if (filter != undefined && prevProps.filter !== filter) {
             this.setState({
-                searchBy:filter,
+                searchBy: filter,
                 isLoaded : false,
             }, () => this.getListItem())
         }
         return false;
     }
     render() {
-        const { categories_list, QueriesList, isLoaded } = this.state;
+        const { categories_list, QueriesList, isLoaded, TotalRecords, Page } = this.state;
         return(
             <div>
                 <section className="query-banner-img add-cat-page">
                     <MyCategories addMore={() => this.categoriesModalShow()}/>
                     <div className="container">
                         <div className="query-inner d-flex">
-                            <SideMenu />
+                            <SideMenu filter={this.props.filter} component={'querylist'}/>
                             <div className="my-queries">
                                 <FilterBy shortItems={this.shortItems}/>
                                 <div className="tabs-content-cover">
@@ -143,7 +143,7 @@ export default class List extends React.Component {
                                     </div>
                                     <div>
                                         <div className="tab-content-list queries-list">
-                                            {(!isLoaded) ? <div>Loading...</div> : <ListItem QueriesList={QueriesList} userId={user_id} PageNo={this.getListItem}/>}
+                                            {(!isLoaded) ? <div>Loading...</div> : <ListItem QueriesList={QueriesList} userId={user_id} TotalRecords={TotalRecords} PageNo={this.getListItem}/>}
                                         </div>
                                     </div>
                                 </div>
