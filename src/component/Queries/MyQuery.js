@@ -67,7 +67,7 @@ export default class List extends React.Component {
                                 <div className="tabs-content-cover">
                                     <div className="tab-content">
                                         <div className="tab-content-list">
-                                            {(!isLoaded) ? <div>Loading...</div> : <ListItem QueriesList={QueriesList} userId={user_id} PageNo={this.getMyItem}/>}
+                                            {(!isLoaded) ? <div>Loading...</div> : <ListItem QueriesList={QueriesList} userId={user_id} PageNo={this.getMyItem} component={'MyQuery'}/>}
                                         </div>
                                     </div>
                                 </div>

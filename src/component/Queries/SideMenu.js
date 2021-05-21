@@ -44,15 +44,15 @@ export default class SideMenu extends React.Component {
                             </Link>
                         </li>
                         <li id="Queries" className={'menu-items ' + (component === 'querylist' && 'active')}>
-                            <Link onClick={() => this.toggleSubmenu('queries-submenu')}>
+                            <Link to="#" onClick={() => this.toggleSubmenu('queries-submenu')}>
                                 <img src={questionmark} className="sidebar-icon" />
                                 <img src={hoverquestionmark} className="sidebar-icon hover-icon" /> Queries
                             </Link>
                             <ul className="sidebar-submenu ng-star-inserted queries-submenu" style={{display : this.state.submenuIsActive && this.state.submenu == 'queries-submenu' ? 'block' : 'none'}}>
-                                <li className={filter === 2 && 'active'}><Link to="/queries/recent">Recent Queries</Link></li>
-                                <li className={filter === 3 && 'active'}><Link to="/queries/top10">Top 10 Queries</Link></li>
-                                <li className={filter === 4 && 'active'}><Link to="/queries/popular">Popular Queries</Link></li>
-                                <li className={filter === 1 && 'active'}><Link to="/queries/general">All Queries</Link></li>
+                                <li className={(filter === 2) ? 'active' : ''}><Link to="/queries/recent">Recent Queries</Link></li>
+                                <li className={(filter === 3) ? 'active' : ''}><Link to="/queries/top10">Top 10 Queries</Link></li>
+                                <li className={(filter === 4) ? 'active' : ''}><Link to="/queries/popular">Popular Queries</Link></li>
+                                <li className={(filter === 1) ? 'active' : ''}><Link to="/queries/general">All Queries</Link></li>
                             </ul>
                         </li>
                         <li className={'menu-items ' + (component === 'myquery' && 'active')}>

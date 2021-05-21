@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import * as Queries from '../../services/Queries';
@@ -11,6 +12,9 @@ import speechbubbleoutline from '../../assets/images/speech-bubble-outline.svg';
 import viewoutline from '../../assets/images/view-outline.svg';
 import shareoutline from '../../assets/images/share-outline.svg';
 import more from '../../assets/images/more.png';
+import edit_btn from '../../assets/images/edit.svg'; 
+import delete_btn from '../../assets/images/delete.svg';
+
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
 
@@ -38,12 +42,10 @@ export default class ListItem extends React.Component {
         }
     }
     componentDidMount() {
-        // setTimeout(() => {
-            this.setState({
-                TotalRecords : this.props.QueriesList.length,
-                QueriesList : this.props.QueriesList.slice(0, 10),
-            });
-        // }, 1000);
+        this.setState({
+            TotalRecords : this.props.QueriesList.length,
+            QueriesList : this.props.QueriesList.slice(0, 10),
+        });
     }
     toggleCatList = (_id) => {
         if (this.state.listCategoryShow === _id) {
@@ -173,8 +175,18 @@ export default class ListItem extends React.Component {
                                 </div>
                             </div>
                             <span className="ng-star-inserted">
-                                {Query.IsEnded === false ? <div className="poll-end-time">Poll End Time - {Query.EndDate}</div> : <div className="poll-end-time poll-ended">Poll Ended</div> }
+                                {Query.IsEnded === true ? <div className="poll-end-time poll-ended">Poll Ended</div> : <div className="poll-end-time">Poll End Time - {Query.EndDate}</div> }
                                 <div className="right-vote-info ng-star-inserted">{Query.TotalVotes} Vote</div>
+                                {(this.props.component && this.props.component === 'MyQuery' && Query.IsEnded === false) && 
+                                    <div className="query-cta-btns">
+                                        <span className="edit ng-star-inserted">
+                                            <Link className="edit-btn" to={'/edit-query/'+Query._id}><img src={edit_btn} alt="smile" /></Link>
+                                        </span>
+                                        <span className="delete ng-star-inserted">
+                                            <img src={delete_btn} alt="smile" />
+                                        </span>
+                                    </div>
+                                }
                             </span>
                         </div>
                     ))}

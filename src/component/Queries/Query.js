@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import * as Queries from '../../services/Queries';
 import * as User from '../User/UserDetails';
 import SideMenu from './SideMenu';
@@ -8,20 +9,33 @@ import moment from 'moment';
 import { AllCategories } from './Categories';
 
 
-export default class ListItem extends React.Component {
-    constructor() {
+
+const numberWordsArr = {
+    '0' : 'One',
+    '1' : 'Two',
+    '2' : 'Three',
+    '3' : 'Four',
+    '4' : 'Five',
+    '5' : 'Six',
+};
+
+export class AddQuery extends React.Component {
+    constructor(props = '') {
         super();
         this.state = {
-            query:'',
+            id : (props.id && props.id !== '') ? props.id : '',
+            query: (props.queryDetail && props.queryDetail.Query !== '') ? props.queryDetail.Query : '',
             showCategoryErrorModal: 'none',
             categories_list: '',
             queryImageFile : '',
-            IsPublic: true,
+            queryImageUrl: props.queryDetail && props.queryDetail.File ? props.queryDetail.File : '',
+            IsPublic: (props.queryDetail && props.queryDetail.IsPublic) ? props.queryDetail.IsPublic : true,
             Category: [],
-            EndDate: new Date(),
+            EndDate: (props.queryDetail && props.queryDetail.EndDate !== '') ? moment(props.queryDetail.EndDate).format('DD/MM/YYYY HH:mm A') : new Date(),
             OptionType: "1",
-            ChartOption: "2",
-            options : [
+            Category: (props.queryDetail && props.queryDetail.Category !== '') ? props.queryDetail.Category : [],
+            ChartOption: (props.queryDetail && props.queryDetail.ChartOption !== '') ? props.queryDetail.ChartOption : "2",
+            options : (props.queryDetail && props.queryDetail.Options !== '') ? props.queryDetail.Options :  [
                 {
                     value : '',
                     optionImage : ''
@@ -84,7 +98,6 @@ export default class ListItem extends React.Component {
                 errors.options[name] = null;
             }
         }
-        // showCategoryErrorModal
         this.setState({
             [name]: value,
             options : options,
@@ -108,17 +121,6 @@ export default class ListItem extends React.Component {
             default:
                 break;
         }
-
-
-            // case 'selectCategory':
-            // showCategoryErrorModal
-            // if (Category.length === 0) {
-            //     errors.query = 'Query is required*';
-            // } else {
-            //     errors.query = null;
-            // }
-            // break;
-
         if (name === 'selectCategory') {
             this.setState({ 'Category' : [...Category, value] });
         } else {
@@ -126,15 +128,7 @@ export default class ListItem extends React.Component {
         }
     }
     submitForm = async () => { 
-        const { options, query, queryImageFile, IsPublic, EndDate, ChartOption, Category } = this.state;
-        const numberWordsArr = {
-            '0' : 'One',
-            '1' : 'Two',
-            '2' : 'Three',
-            '3' : 'Four',
-            '4' : 'Five',
-            '5' : 'Six',
-        };
+        const { options, query, queryImageFile, IsPublic, EndDate, ChartOption, Category, id } = this.state;
         let postArr = {
             "UserID": User.user_id,
             "IsPublic": IsPublic,
@@ -155,9 +149,18 @@ export default class ListItem extends React.Component {
             option.value !== '' && (postArr['Option'+numberWordsArr[key]] = option.value);
             option.optionImage !== '' && (postArr['Option'+numberWordsArr[option.value]+'File'] = option.optionImage);
         });
-        Queries.create_poll(postArr).then(
-            result => {console.log('result', result)}
-        )
+        const formData = new FormData();
+        Object.keys(postArr).forEach(key => formData.append(key, postArr[key]));
+        
+        if (this.props.action && this.props.action === 'editquery') {
+            Queries.edit_query(this.state.id, formData).then(
+                result => {console.log('result', result)}
+            )
+        } else {
+            Queries.create_poll(formData).then(
+                result => {console.log('result', result)}
+            )
+        }
     }
     
     removeOptions = (key) => {
@@ -180,7 +183,7 @@ export default class ListItem extends React.Component {
         )
     }
     render() {
-        const { queryImageFile, options, errors, showCategoryErrorModal, ChartOption, EndDate, IsPublic, Category } = this.state;
+        const { queryImageFile, queryImageUrl, options, errors, showCategoryErrorModal, ChartOption, EndDate, IsPublic, Category, categories_list } = this.state;
         const alphabetArr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
         return(
             <section className="query-banner-img">
@@ -200,9 +203,9 @@ export default class ListItem extends React.Component {
                                     <div className="select-query-type-block">
                                         <div className="upload-img-box">
                                             <div className="text-area-field">
-                                                {queryImageFile != '' &&
+                                                {(queryImageUrl !== '' || queryImageFile !== '') &&
                                                     <div className="file-upload-blk">
-                                                        <img alt="smile" src={URL.createObjectURL(queryImageFile)} />
+                                                        <img alt="smile" src={(queryImageUrl !== '') ? queryImageUrl : URL.createObjectURL(queryImageFile)} />
                                                         <div className="remove-selected-file" onClick={this.removeQueryImage}>
                                                             <span>X</span>
                                                         </div>
@@ -223,9 +226,9 @@ export default class ListItem extends React.Component {
                                             {options != '' && options.map((option, key) => ( (key < 6) &&
                                             <div key={key} className="option-textarea-inner">
                                                 <div className="text-area-field">
-                                                    {(option.optionImage && option.optionImage.length > 0) &&
+                                                    {((option['Option'+numberWordsArr[key]+'File'] && option['Option'+numberWordsArr[key]+'File'] !== undefined && option['Option'+numberWordsArr[key]+'File'] !== '') || (option.optionImage && option.optionImage.length !== '')) &&
                                                         <div className="opt-upload-file">
-                                                            <img alt="smile" src={URL.createObjectURL(option.optionImage[0])} />
+                                                            <img alt="smile" src={(option['Option'+numberWordsArr[key]+'File'] !=='' && option['Option'+numberWordsArr[key]+'File'] !== undefined) ? option['Option'+numberWordsArr[key]+'File'] : URL.createObjectURL(option.optionImage[0])} />
                                                             <div className="remove-selected-file" onClick={() => this.removeOptionsImage(key)}>
                                                                 <span>X</span>
                                                             </div>
@@ -235,7 +238,7 @@ export default class ListItem extends React.Component {
                                                         <input id="OptionOneFile" type="file" name={key} onChange={this.changeOptionInfo} />
                                                         <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
                                                     </div>
-                                                    <textarea placeholder={'Option '+alphabetArr[key]+'.'} name={key} className="full-height"  defaultValue={options.value} onChange={this.changeOptionInfo}></textarea>
+                                                    <textarea placeholder={'Option '+alphabetArr[key]+'.'} name={key} className="full-height"  defaultValue={(option.Answer) ? option.Answer : options.value} onChange={this.changeOptionInfo}></textarea>
                                                     {key > 1 && 
                                                         <div className="detete-opt" onClick={() => this.removeOptions(key)}>
                                                             <span className="delete">X</span>
@@ -254,28 +257,28 @@ export default class ListItem extends React.Component {
                                         <div className="section-title">Representation of your Result</div>
                                         <div className="custom-select-box">
                                             <div className="select-box-inner">
-                                                <input id="pieChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="2" className="ChartOption" onChange={this.handleChange} defaultChecked/>
+                                                <input id="pieChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="2" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "2" && true}/>
                                                 <label htmlFor="pieChart">
                                                     <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/pie-chart.png"} />
                                                     <span>Pie Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
-                                                <input id="barChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="1" className="ChartOption" onChange={this.handleChange} />
+                                                <input id="barChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="1" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "1" && true}/>
                                                 <label htmlFor="barChart">
                                                     <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/bar-chart.jpg"} />
                                                     <span>Bar Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
-                                                <input id="lineChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="3" className="ChartOption" onChange={this.handleChange} />
+                                                <input id="lineChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="3" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "3" && true}/>
                                                 <label htmlFor="lineChart">
                                                     <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/lin-chart.jpg"} />
                                                     <span>Line Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
-                                                <input id="donutChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="4" className="ChartOption" onChange={this.handleChange} />
+                                                <input id="donutChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="4" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "4" && true}/>
                                                 <label htmlFor="donutChart">
                                                     <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/donut-chart.png"} />
                                                     <span>Donut Chart</span>
@@ -287,10 +290,10 @@ export default class ListItem extends React.Component {
                                         <div className="ask-query-inner flex-box">
                                             <h2 className="section-title">Share your query with</h2>
                                             <div className="query-type-radio">
-                                                <span className="public"><input type="radio" name="IsPublic" formcontrolname="isPublic" value={true} className="isPublic" onChange={this.handleChange} defaultChecked/>
+                                                <span className="public"><input type="radio" name="IsPublic" formcontrolname="isPublic" value={true} className="isPublic" onChange={this.handleChange} defaultChecked={IsPublic === true && true}/>
                                                     <label htmlFor="public"><i aria-hidden="true" className="fa fa-users"></i> Public </label>
                                                 </span>
-                                                <span className="private"><input type="radio" name="IsPublic" formcontrolname="isPublic" value={false} className="isPublic" onChange={this.handleChange} />
+                                                <span className="private"><input type="radio" name="IsPublic" formcontrolname="isPublic" value={false} className="isPublic" onChange={this.handleChange} defaultChecked={IsPublic === false && true}/>
                                                     <label htmlFor="private"><i aria-hidden="true" className="fa fa-user"></i> Private </label>
                                                 </span>
                                             </div>
@@ -301,9 +304,7 @@ export default class ListItem extends React.Component {
                                             <h2 className="section-title">Query End Time</h2>
                                             <div className="form-group">
                                                 <div className="input-group date select-date choose-calendar-picker">
-                                                    {/* <span className="input-group-addon"> */}
-                                                        <Datetime dateFormat="DD/MM/YYYY" initialValue={EndDate} />
-                                                    {/* </span> */}
+                                                    <Datetime dateFormat="DD/MM/YYYY" initialValue={EndDate} />
                                                 </div>
                                             </div>
                                         </div>
@@ -311,7 +312,7 @@ export default class ListItem extends React.Component {
                                     <div id="select-category" className="select-category">
                                         <h2 className="section-title">Select Categories</h2>
                                         <div className="five-grid">
-                                            <AllCategories categoriesList={this.state.categories_list} selectCategories={this.handleChange}/>
+                                            <AllCategories categoriesList={categories_list} Categories={Category} selectCategories={this.handleChange}/>
                                         </div>
                                     </div>
                                     <div className="submit-btn">
@@ -323,7 +324,7 @@ export default class ListItem extends React.Component {
                     </div>
                 </div>
                 <div className="swal2-container swal2-center swal2-backdrop-show" style={{overflowY: "auto", display : showCategoryErrorModal}}>
-                    <div aria-labelledby="swal2-title" aria-describedby="swal2-content" className="swal2-popup swal2-modal swal2-icon-info swal2-show" tabindex="-1" role="dialog" aria-live="assertive" aria-modal="true" style={{display: "flex"}}>
+                    <div aria-labelledby="swal2-title" aria-describedby="swal2-content" className="swal2-popup swal2-modal swal2-icon-info swal2-show" tabIndex="-1" role="dialog" aria-live="assertive" aria-modal="true" style={{display: "flex"}}>
                         <div className="swal2-header">
                             <ul className="swal2-progress-steps" style={{display: "none"}}></ul>
                             <div className="swal2-icon swal2-error" style={{display: "none"}}></div>
@@ -349,4 +350,27 @@ export default class ListItem extends React.Component {
             </section>
         )
     }
+}
+
+export function EditQuery () {
+    const { id } = useParams();
+    const [ queryDetail, setQueryDetail ] = React.useState('');
+    const [ isLoaded, setIsLoaded ] = React.useState(false);
+    
+    React.useEffect(() => {
+        Queries.get_query_by_id(id).then(
+            result => {
+                if (result.Status === "Success" && isLoaded === false) {
+                    setQueryDetail(result.Data);
+                    setIsLoaded(true);
+                }
+            }
+        )
+    });
+
+    return(
+        <div>
+            {(!isLoaded) ? <div>Loading...</div> :  <AddQuery queryDetail={queryDetail} action="editquery" id={id}/>}
+        </div>
+    )
 }

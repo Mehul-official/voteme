@@ -5,22 +5,22 @@ import Footer from './component/common/Footer';
 import Login from './component/User/Login';
 import QueriesList from './component/Queries/List';
 import MyQuery from './component/Queries/MyQuery';
-import AddQuery from './component/Queries/AddQuery';
+import { AddQuery, EditQuery } from './component/Queries/Query';
+import { token, tokenExpireIn } from './component/User/UserDetails';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
 
 require('dotenv').config();
 process.env.CI = false;
+(tokenExpireIn !== undefined && tokenExpireIn !== '' && tokenExpireIn !== false && tokenExpireIn <= new Date().getTime()/1000) && localStorage.clear();
 
-const userDetails = (localStorage.userDetails) ? JSON.parse(localStorage.userDetails) : '';
-let token = userDetails !== '' && userDetails.Data.AuthoToken;
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Switch>
 					<Route exact path="/login">
-           {(token === false) ? <Login /> : <Redirect to="/" />}
+            {(token !== undefined && token !== '' && token !== false) ?  <Redirect to="/" /> : <Login />}
           </Route>
           <Route exact path="/">
             <Header />
@@ -69,6 +69,13 @@ function App() {
               {(token !== undefined && token !== '' && token !== false) ? <AddQuery /> : <Redirect to="/" />}
             <Footer />
           </Route>
+          
+          <Route exact path="/edit-query/:id">
+            <Header />
+              {(token !== undefined && token !== '' && token !== false) ? <EditQuery /> : <Redirect to="/" />}
+            <Footer />
+          </Route>
+          
         </Switch>  
       </BrowserRouter>
     </div>

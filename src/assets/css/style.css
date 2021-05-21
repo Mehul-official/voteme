@@ -898,8 +898,11 @@ footer {
 .sidebar-inner li:last-child a {
     margin-bottom: 0;
 }
-.sidebar-inner li.active a, .sidebar-inner li a:hover {
+.sidebar-inner li.active a, .sidebar-inner li a:hover, .sidebar-inner li ul.sidebar-submenu .active a {
     color: #0071bc;
+}
+.sidebar-inner li ul.sidebar-submenu a {
+    color: #000;
 }
 .more-filter-box {
 	margin: 0 0 0 auto;
@@ -1613,16 +1616,22 @@ footer {
 .poll-ended {
     background: #ebebeb;
 }
+.query-cta-btns span .edit-btn {
+    height: inherit;
+}
 .query-cta-btns span img {
+    margin: 0 auto;
     width: 50%;
     filter: contrast(0) opacity(0.5);
     display: block;
     transition: 0.3s;
+    height: inherit;
 }
 .query-cta-btns {
     position: absolute;
     right: 20px;
     top: 60px;
+    padding-top: 50px;
 }
 .query-cta-btns span {
     border: 2px solid #dddddd;

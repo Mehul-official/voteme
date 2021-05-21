@@ -18,19 +18,35 @@ export const categories_list = () =>
     .then((res) => res.json())
     .then((result) => result)
 
-export const create_poll = (query) => 
-    fetch(`${api}/createpoll`, { 
+export const create_poll = (query) =>
+    fetch(`${api}/createpoll`, {
         method: 'post',
         headers: {
             ...headers,
             'Content-Type' : 'multipart/form-data',
             'Cache-Control' : 'no-cache',
+            'type': 'formData'
         },
-        body: JSON.stringify(query)
+        body: query
     })
     .then((res) => res.json())
     .then((result) => result)
-    
+
+
+export const edit_query = (id, query) =>
+    fetch(`${api}/editquery/${id}`, {
+        method: 'post',
+        headers: {
+            ...headers,
+            'Content-Type' : 'multipart/form-data',
+            'Cache-Control' : 'no-cache',
+            'type': 'formData'
+        },
+        body: query
+    })
+    .then((res) => res.json())
+    .then((result) => result)
+
 export const update_user_category = (query) => 
     fetch(`${api}/updateusercategory`, { 
         method: 'post',
@@ -53,6 +69,18 @@ export const get_query = (query) =>
     })
     .then((res) => res.json())
     .then((result) => result)
+
+
+export const get_query_by_id = (id) => 
+    fetch(`${api}/querydetail/${id}`, { 
+        method: 'get',
+        headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+        },
+    })
+    .then((res) => res.json())
+    .then((result) => result)    
 
 export const get_my_query = (query) => 
     fetch(`${api}/myquery?${query}`, { 
