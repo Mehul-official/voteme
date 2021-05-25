@@ -3,7 +3,6 @@ const userDetails = (localStorage.userDetails) ? JSON.parse(localStorage.userDet
 let token = userDetails != '' && userDetails.Data.AuthoToken;
 
 const headers = {
-    'Accept': 'application/json',
     'Authorization': 'Bearer '+token
 }
 
@@ -12,6 +11,7 @@ export const categories_list = () =>
         method: 'get',
         headers: {
             ...headers,
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
     })
@@ -23,9 +23,6 @@ export const create_poll = (query) =>
         method: 'post',
         headers: {
             ...headers,
-            'Content-Type' : 'multipart/form-data',
-            'Cache-Control' : 'no-cache',
-            'type': 'formData'
         },
         body: query
     })
@@ -38,9 +35,6 @@ export const edit_query = (id, query) =>
         method: 'post',
         headers: {
             ...headers,
-            'Content-Type' : 'multipart/form-data',
-            'Cache-Control' : 'no-cache',
-            'type': 'formData'
         },
         body: query
     })
@@ -51,10 +45,9 @@ export const update_user_category = (query) =>
     fetch(`${api}/updateusercategory`, { 
         method: 'post',
         headers: {
-            ...headers,
-            'Content-Type': 'application/json'
+            ...headers
         },
-        body: JSON.stringify(query)
+        body: query
     })
     .then((res) => res.json())
     .then((result) => result)
@@ -64,6 +57,7 @@ export const get_query = (query) =>
         method: 'get',
         headers: {
             ...headers,
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
     })
@@ -76,6 +70,7 @@ export const get_query_by_id = (id) =>
         method: 'get',
         headers: {
             ...headers,
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
     })
@@ -87,6 +82,7 @@ export const get_my_query = (query) =>
         method: 'get',
         headers: {
             ...headers,
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
     })
@@ -98,6 +94,7 @@ export const likeordislike = (query, query_id) =>
         method: 'post',
         headers: {
             ...headers,
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(query)

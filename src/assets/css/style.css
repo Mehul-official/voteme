@@ -687,7 +687,7 @@ ul {
 }
 .form-control {
     border: 1px solid #dddddd !important;
-    padding: 12px 15px !important;
+    padding: 12px 15px;
     font-family: 'Roboto' !important;
     height: auto !important;
     border-radius: 0 !important;
@@ -2681,6 +2681,12 @@ footer {
     color: #f00;
     font-size: 12px;
     margin-top: 2px;
+}
+.edit-profile-form .validation-msg {
+    text-align: left;
+}
+.edit-profile-info .edit_name {
+    cursor: pointer;
 }
 .cross-validation-error {
     border-bottom: 3px solid red!important;

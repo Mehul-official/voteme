@@ -6,8 +6,9 @@ import SideMenu from './SideMenu';
 import "react-datetime/css/react-datetime.css";
 import Datetime from 'react-datetime';
 import moment from 'moment';
+import confetti from '../../assets/images/confetti.gif';
+import check_circle1 from '../../assets/images/check-circle1.gif';
 import { AllCategories } from './Categories';
-
 
 
 const numberWordsArr = {
@@ -19,23 +20,30 @@ const numberWordsArr = {
     '5' : 'Six',
 };
 
+var yesterday = moment().subtract( 1, 'day' );
+var valid = ( current ) => current.isAfter( yesterday );
 export class AddQuery extends React.Component {
     constructor(props = '') {
         super();
+
+        this.Category = [];
+        props.queryDetail !== undefined && props.queryDetail.Category !== undefined && props.queryDetail.Category.length > 0 && (props.queryDetail.Category).map((ctgry, key) => {
+            this.Category.push(ctgry._id);
+        });
         this.state = {
             id : (props.id && props.id !== '') ? props.id : '',
             query: (props.queryDetail && props.queryDetail.Query !== '') ? props.queryDetail.Query : '',
             showCategoryErrorModal: 'none',
+            showQuerySuccess: 'none',
             categories_list: '',
             queryImageFile : '',
             queryImageUrl: props.queryDetail && props.queryDetail.File ? props.queryDetail.File : '',
             IsPublic: (props.queryDetail && props.queryDetail.IsPublic) ? props.queryDetail.IsPublic : true,
-            Category: [],
             EndDate: (props.queryDetail && props.queryDetail.EndDate !== '') ? moment(props.queryDetail.EndDate).format('DD/MM/YYYY HH:mm A') : new Date(),
             OptionType: "1",
-            Category: (props.queryDetail && props.queryDetail.Category !== '') ? props.queryDetail.Category : [],
+            Category: this.Category,
             ChartOption: (props.queryDetail && props.queryDetail.ChartOption !== '') ? props.queryDetail.ChartOption : "2",
-            options : (props.queryDetail && props.queryDetail.Options !== '') ? props.queryDetail.Options :  [
+            options : (props.queryDetail && props.queryDetail.Options !== '') ? props.queryDetail.Options : [
                 {
                     value : '',
                     optionImage : ''
@@ -104,27 +112,32 @@ export class AddQuery extends React.Component {
         });
     }
     handleChange = (event) => {
-        let { options, errors, IsPublic, ChartOption, Category } = this.state;
-        const { type, name, id, value, className, checked } = event.target;
-        switch (name) {
-            case 'query': 
-                if (value == '') {
-                    errors.query = 'Query is required*';
-                } else {
-                    errors.query = null;
-                }
-                break;
-            case 'submit':
-                event.preventDefault();
-                this.submitForm();
-                break;
-            default:
-                break;
-        }
-        if (name === 'selectCategory') {
-            this.setState({ 'Category' : [...Category, value] });
+        if (event.target !== undefined) {
+            let { options, errors, IsPublic, ChartOption, Category } = this.state;
+            const { type, name, id, value, className, checked } = event.target;
+            
+            switch (name) {
+                case 'query': 
+                    if (value == '') {
+                        errors.query = 'Query is required*';
+                    } else {
+                        errors.query = null;
+                    }
+                    break;
+                case 'submit':
+                    event.preventDefault();
+                    this.submitForm();
+                    break;
+                default:
+                    break;
+            }
+            if (name === 'selectCategory') {
+                this.setState({ 'Category' : [...Category, value] });
+            } else {
+                this.setState({ [name]: value });
+            }
         } else {
-            this.setState({ [name]: value });
+            this.setState({ EndDate: moment(event).format('DD/MM/YYYY HH:mm A') });
         }
     }
     submitForm = async () => { 
@@ -132,10 +145,11 @@ export class AddQuery extends React.Component {
         let postArr = {
             "UserID": User.user_id,
             "IsPublic": IsPublic,
-            "EndDate": moment(EndDate).format('DD/MM/YYYY HH:mm A'),
+            "EndDate": EndDate,
             "OptionType": "1",
             "ChartOption": ChartOption
-        }
+        };
+
         if (Category.length > 0) {
             postArr.Category = Category.join(',')
         } else {
@@ -146,19 +160,37 @@ export class AddQuery extends React.Component {
         queryImageFile !== '' && (postArr.File = queryImageFile);
         
         options.length > 0 && options.map((option, key) => {
-            option.value !== '' && (postArr['Option'+numberWordsArr[key]] = option.value);
-            option.optionImage !== '' && (postArr['Option'+numberWordsArr[option.value]+'File'] = option.optionImage);
+            if (this.props.action && this.props.action === 'editquery') {
+                option.Answer !== '' && (postArr['Option'+numberWordsArr[key]] = option.Answer);
+                option.optionImage !== '' && (postArr['Option'+numberWordsArr[key]+'File'] = option.optionImage);
+            } else {
+                option.value !== '' && (postArr['Option'+numberWordsArr[key]] = option.value);
+                option.optionImage !== '' && (postArr['Option'+numberWordsArr[key]+'File'] = option.optionImage);
+            }
         });
-        const formData = new FormData();
-        Object.keys(postArr).forEach(key => formData.append(key, postArr[key]));
         
+        let formData = new FormData();
+        var postArr_values = Object.values(postArr);
+        var postArr_keys = Object.keys(postArr);
+        for (let i = 0; i < postArr_keys.length; i++) {
+            formData.append(postArr_keys[i], postArr_values[i]);
+        }
         if (this.props.action && this.props.action === 'editquery') {
             Queries.edit_query(this.state.id, formData).then(
-                result => {console.log('result', result)}
+                result => {
+                    if (result.Status === "Success") {
+                        this.setState({ showQuerySuccess : 'block' });
+                    }
+                }
             )
         } else {
             Queries.create_poll(formData).then(
-                result => {console.log('result', result)}
+                result => {
+                    console.log(result)
+                    if (result.Status === "Success") {
+                        this.setState({ showQuerySuccess : 'block' });
+                    } 
+                }
             )
         }
     }
@@ -183,7 +215,7 @@ export class AddQuery extends React.Component {
         )
     }
     render() {
-        const { queryImageFile, queryImageUrl, options, errors, showCategoryErrorModal, ChartOption, EndDate, IsPublic, Category, categories_list } = this.state;
+        const { queryImageFile, queryImageUrl, options, errors, ChartOption, EndDate, IsPublic, Category, categories_list, showCategoryErrorModal, showQuerySuccess } = this.state;
         const alphabetArr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
         return(
             <section className="query-banner-img">
@@ -304,7 +336,7 @@ export class AddQuery extends React.Component {
                                             <h2 className="section-title">Query End Time</h2>
                                             <div className="form-group">
                                                 <div className="input-group date select-date choose-calendar-picker">
-                                                    <Datetime dateFormat="DD/MM/YYYY" initialValue={EndDate} />
+                                                    <Datetime dateFormat="DD/MM/YYYY" initialValue={EndDate} name="EndDate" isValidDate={ valid }  onChange={this.handleChange}/>
                                                 </div>
                                             </div>
                                         </div>
@@ -326,15 +358,9 @@ export class AddQuery extends React.Component {
                 <div className="swal2-container swal2-center swal2-backdrop-show" style={{overflowY: "auto", display : showCategoryErrorModal}}>
                     <div aria-labelledby="swal2-title" aria-describedby="swal2-content" className="swal2-popup swal2-modal swal2-icon-info swal2-show" tabIndex="-1" role="dialog" aria-live="assertive" aria-modal="true" style={{display: "flex"}}>
                         <div className="swal2-header">
-                            <ul className="swal2-progress-steps" style={{display: "none"}}></ul>
-                            <div className="swal2-icon swal2-error" style={{display: "none"}}></div>
-                            <div className="swal2-icon swal2-question" style={{display: "none"}}></div>
-                            <div className="swal2-icon swal2-warning" style={{display: "none"}}></div>
                             <div className="swal2-icon swal2-info swal2-icon-show" style={{display: "flex"}}>
                                 <div className="swal2-icon-content">i</div>
                             </div>
-                            <div className="swal2-icon swal2-success" style={{display: "none"}}></div>
-                            <img className="swal2-image" style={{display: "none"}} />
                             <h2 className="swal2-title" id="swal2-title" style={{display: "flex"}}>Whoops..</h2>
                             <button type="button" className="swal2-close" aria-label="Close this dialog" style={{display: "none"}}>×</button>
                         </div>
@@ -344,6 +370,21 @@ export class AddQuery extends React.Component {
                         <div className="swal2-actions">
                             <div className="swal2-loader"></div>
                             <button type="button" className="swal2-confirm swal2-styled" aria-label="" style={{display: "inline-block", borderLeftColor: "rgb(48, 133, 214)", borderRightColor: "rgb(48, 133, 214)"}} onClick={() => this.setState({ showCategoryErrorModal : 'none' })}>OK</button>
+                        </div>
+                    </div>
+                </div>
+                <div className="swal2-container swal2-center swal2-backdrop-show" style={{overflowY: 'auto', display : showQuerySuccess}}>
+                    <div aria-labelledby="swal2-title" aria-describedby="swal2-content" className="swal2-popup swal2-modal swal2-show" tabIndex="-1" role="dialog" aria-live="assertive" aria-modal="true" style={{background: "url('"+confetti+"')", display: "flex"}}>
+                        <div className="swal2-header">
+                            <img className="swal2-image" src={check_circle1} alt="Custom image" style={{width: '150px', height: '150px'}} />
+                            <button type="button" className="swal2-close" aria-label="Close this dialog">×</button>
+                        </div>
+                        <div className="swal2-content">
+                            <div id="swal2-content" className="swal2-html-container" style={{display: "block"}}>Query Created Successfully!</div>
+                        </div>
+                        <div className="swal2-actions">
+                            <div className="swal2-loader"></div>
+                            <button type="button" className="swal2-confirm swal2-styled" aria-label="" style={{display: "inline-block", borderLeftColor: "rgb(48, 133, 214)", borderRightColor: "rgb(48, 133, 214)"}} onClick={() => { this.setState({ showQuerySuccess : 'none' }); }}>OK</button>
                         </div>
                     </div>
                 </div>

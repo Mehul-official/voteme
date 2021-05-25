@@ -97,10 +97,11 @@ export default class List extends React.Component {
         }
     }
     updateCategories = () => {
-        Queries.update_user_category({
-            Category: this.state.choosenCategoriesIds
-        }).then(
-            result => result
+        let formData = new FormData();
+        var choosenCategoriesIdsArr = this.state.choosenCategoriesIds;
+        formData.append('Category', choosenCategoriesIdsArr);
+        Queries.update_user_category(formData).then(
+            result => {console.log('result',result)}
         )
     }
     componentDidMount() {

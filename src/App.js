@@ -5,9 +5,11 @@ import Footer from './component/common/Footer';
 import Login from './component/User/Login';
 import QueriesList from './component/Queries/List';
 import MyQuery from './component/Queries/MyQuery';
+import Profile from './component/User/Profile';
 import { AddQuery, EditQuery } from './component/Queries/Query';
 import { token, tokenExpireIn } from './component/User/UserDetails';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { Form } from 'react-bootstrap';
 
 
 require('dotenv').config();
@@ -76,6 +78,12 @@ function App() {
             <Footer />
           </Route>
           
+          <Route exact path="/profile">
+            <Header />
+              {(token !== undefined && token !== '' && token !== false) ? <Profile /> : <Redirect to="/" />}
+            <Footer />
+          </Route>
+
         </Switch>  
       </BrowserRouter>
     </div>
