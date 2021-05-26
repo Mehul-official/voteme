@@ -5,6 +5,7 @@ import Footer from './component/common/Footer';
 import Login from './component/User/Login';
 import QueriesList from './component/Queries/List';
 import MyQuery from './component/Queries/MyQuery';
+import QueryDetail from './component/Queries/QueryDetail';
 import Profile from './component/User/Profile';
 import { AddQuery, EditQuery } from './component/Queries/Query';
 import { token, tokenExpireIn } from './component/User/UserDetails';
@@ -69,6 +70,12 @@ function App() {
           <Route exact path="/add-query">
             <Header />
               {(token !== undefined && token !== '' && token !== false) ? <AddQuery /> : <Redirect to="/" />}
+            <Footer />
+          </Route>
+
+          <Route path="/query-detail/:id">
+            <Header />
+              {(token !== undefined && token !== '' && token !== false) ? <QueryDetail /> : <Redirect to="/" />}
             <Footer />
           </Route>
           

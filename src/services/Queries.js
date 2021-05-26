@@ -32,7 +32,7 @@ export const create_poll = (query) =>
 
 export const edit_query = (id, query) =>
     fetch(`${api}/editquery/${id}`, {
-        method: 'post',
+        method: 'put',
         headers: {
             ...headers,
         },
@@ -43,11 +43,14 @@ export const edit_query = (id, query) =>
 
 export const update_user_category = (query) => 
     fetch(`${api}/updateusercategory`, { 
-        method: 'post',
+        method: 'put',
         headers: {
-            ...headers
+            ...headers,
+            'cache-control': 'no-cache',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: query
+        body: JSON.stringify(query)
     })
     .then((res) => res.json())
     .then((result) => result)
@@ -57,7 +60,7 @@ export const get_query = (query) =>
         method: 'get',
         headers: {
             ...headers,
-            'Accept': 'application/json',
+            'Accept': 'application/json,  text/plain, */*',
             'Content-Type': 'application/json'
         },
     })

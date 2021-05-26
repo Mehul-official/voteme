@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import * as Queries from '../../services/Queries';
@@ -30,6 +30,7 @@ export default class ListItem extends React.Component {
             TotalRecords : ''
         }
     }
+
     fetchMoreData = () => {
         this.setState(prevState => ({
             QueriesList : [...prevState.QueriesList, ...this.props.QueriesList.slice(this.state.start, this.state.end)],
@@ -78,7 +79,7 @@ export default class ListItem extends React.Component {
                     Query.TotalDisLikes = Query.TotalDisLikes-1;
                 }
             }
-        })
+        });
         this.setState({
             QueriesList : QueriesList,
         });
@@ -92,7 +93,7 @@ export default class ListItem extends React.Component {
     render() {
         const { Page, TotalRecords, QueriesList } = this.state;
         return(
-            <div className="ng-star-inserted" id="querylist">
+            <div className="" id="querylist">
                 <InfiniteScroll
                 dataLength={this.state.QueriesList.length}
                 next={this.fetchMoreData}
@@ -102,26 +103,26 @@ export default class ListItem extends React.Component {
                 loader={<h4>Loading...</h4>}
                 >
                     {QueriesList !== '' && QueriesList.map((Query, key) => (           
-                        <div key={key} className="query-info-box ng-star-inserted">
-                            <div className="query-head flex-box ng-star-inserted">
-                                <span className="profile-img ng-star-inserted" style={{backgroundImage : (Query.UserDetails && Query.UserDetails[0].Image) ? "url('"+Query.UserDetails[0].Image+"')": ''}}></span>
+                        <div key={key} className="query-info-box ">
+                            <div className="query-head flex-box ">
+                                <span className="profile-img " style={{backgroundImage : (Query.UserDetails && Query.UserDetails[0].Image) ? "url('"+Query.UserDetails[0].Image+"')": ''}}></span>
                                 <div className="about-query-info">
                                     <div className="small-title">{Query.UserDetails[0].FirstName} {Query.UserDetails[0].LastName} </div>
                                     <div className="query-shared-by">
                                     {Query.Category.slice(0, 2).length > 0 && Query.Category.slice(0, 2).map((Category, key) => (
-                                        <span key={key} className="ng-star-inserted">
-                                            <span className="ng-star-inserted"> {Category},  </span>
+                                        <span key={key} className="">
+                                            <span className=""> {Category},  </span>
                                         </span>
                                     ))}
 
                                     {Query.Category.slice(2).length > 0 && 
-                                        <span className="ng-star-inserted">
-                                            <span className="cat-view-more ng-star-inserted" style={{color: 'dodgerblue', cursor: 'pointer'}}>
+                                        <span className="">
+                                            <span className="cat-view-more " style={{color: 'dodgerblue', cursor: 'pointer'}}>
                                                 <span style={{display: 'none'}} id={'hide'+Query._id}>Hide!</span>
                                                 <span id={'view'+Query._id} onClick={() => this.toggleCatList(Query._id)}>View More!</span>
                                                 <span className="category-dropdown" style={{display: this.state.listCategoryShow !== '' && this.state.listCategoryShow === Query._id ? 'block' : 'none'}} id={Query._id}>
                                                     {Query.Category.slice(2).map((Category, key) => (
-                                                        <span key={key} className="ng-star-inserted"> {Category} </span>
+                                                        <span key={key} className=""> {Category} </span>
                                                     ))}
                                                 </span>
                                             </span>
@@ -133,11 +134,11 @@ export default class ListItem extends React.Component {
                             
                             <div className="query-desc">
                                 <div className="query-has-img d-flex">
-                                    <h2 className="small-title"><a style={{cursor: 'pointer'}}>{Query.Query}</a></h2>
+                                    <h2 className="small-title"><Link style={{cursor: 'pointer'}} to={'/queries-detail/'+Query._id}>{Query.Query}</Link></h2>
                                 </div>
-                                <ul className="query-options ng-star-inserted">
+                                <ul className="query-options ">
                                     {Query.Options[0].Options !== '' && Query.Options[0].Options.map((Ans, key) => (
-                                        <li key={key} className="ng-star-inserted">
+                                        <li key={key} className="">
                                             {Ans.Key}. {Ans.Answer}
                                             {this.props.userId === Query.UserId || Query.IsVoted === true ? <ProgressBar now={Ans.Percentage} srOnly /> : '' }
                                             <span>{this.props.userId === Query.UserId || Query.IsVoted === true ? Math.round(Ans.Percentage)+'%' : ''} </span>
@@ -146,16 +147,16 @@ export default class ListItem extends React.Component {
                                 </ul>
                             </div>
                             <div className="query-footer flex-box">
-                                <div className="submit-btn ng-star-inserted">
-                                    <span className="ng-star-inserted"><button type="button" className="desabel-btn">VOTE ME</button></span>
+                                <div className="submit-btn ">
+                                    <span className=""><button type="button" className="desabel-btn">VOTE ME</button></span>
                                 </div>
                                 
                                 <div className="bottom-right-options" id={"query_"+Query._id}>
-                                    <span className="like ng-star-inserted" onClick={() => this.actionButton(Query._id,'like')}>
+                                    <span className="like " onClick={() => this.actionButton(Query._id,'like')}>
                                         <img alt="smile" src={uparrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === false ? 'block' : 'none'}} />
                                         <img alt="smile" src={uparrowfill} className="fill-icon" style={{display : Query.Like === true ? 'block' : 'none' }}/> {Query.Like} {Query.TotalLikes}
                                     </span>
-                                    <span className="dislike ng-star-inserted" onClick={() => this.actionButton(Query._id,'dislike')}>
+                                    <span className="dislike " onClick={() => this.actionButton(Query._id,'dislike')}>
                                         <img alt="smile" src={downarrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === true ? 'block' : 'none'}} /> 
                                         <img alt="smile" src={downarrowfill} className="fill-icon" style={{display : Query.Like === false ? 'block' : 'none'}} /> {Query.TotalDisLikes}
                                     </span>
@@ -168,21 +169,21 @@ export default class ListItem extends React.Component {
                                     <span className="share">
                                         <img alt="smile" src={shareoutline} />
                                     </span>
-                                    <span className="more-opt ng-star-inserted" id={"report_"+Query._id}>
+                                    <span className="more-opt " id={"report_"+Query._id}>
                                         <img alt="smile" src={more} />
                                         <div className="report-pop"><a href="#">Report</a></div>
                                     </span>
                                 </div>
                             </div>
-                            <span className="ng-star-inserted">
+                            <span className="">
                                 {Query.IsEnded === true ? <div className="poll-end-time poll-ended">Poll Ended</div> : <div className="poll-end-time">Poll End Time - {Query.EndDate}</div> }
-                                <div className="right-vote-info ng-star-inserted">{Query.TotalVotes} Vote</div>
+                                <div className="right-vote-info ">{Query.TotalVotes} Vote</div>
                                 {(this.props.component && this.props.component === 'MyQuery' && Query.IsEnded === false) && 
                                     <div className="query-cta-btns">
-                                        <span className="edit ng-star-inserted">
+                                        <span className="edit ">
                                             <Link className="edit-btn" to={'/edit-query/'+Query._id}><img src={edit_btn} alt="smile" /></Link>
                                         </span>
-                                        <span className="delete ng-star-inserted">
+                                        <span className="delete ">
                                             <img src={delete_btn} alt="smile" />
                                         </span>
                                     </div>

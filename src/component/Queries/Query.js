@@ -186,7 +186,6 @@ export class AddQuery extends React.Component {
         } else {
             Queries.create_poll(formData).then(
                 result => {
-                    console.log(result)
                     if (result.Status === "Success") {
                         this.setState({ showQuerySuccess : 'block' });
                     } 
@@ -221,7 +220,7 @@ export class AddQuery extends React.Component {
             <section className="query-banner-img">
                 <div className="container">
                     <div className="query-inner d-flex">
-                        <SideMenu />
+                        <SideMenu component={this.props.action}/>
                         <div className="right-container">
                             <div className="blue-strip">
                                 <h1 className="page-title">Query Of The Day</h1>
@@ -229,7 +228,7 @@ export class AddQuery extends React.Component {
                             <div className="right-container-inner">
                                 <form className="">
                                     <div className="profile-info">
-                                        <span className="profile-img ng-star-inserted" style={{backgroundImage: 'url("'+User.UserImage+'")'}}></span>
+                                        <span className="profile-img " style={{backgroundImage: 'url("'+User.UserImage+'")'}}></span>
                                         <span className="general-title">{User.userDetails.FirstName} {User.userDetails.LastName}</span>
                                     </div>
                                     <div className="select-query-type-block">
@@ -281,7 +280,7 @@ export class AddQuery extends React.Component {
                                             </div>
                                             ))}
                                             {options.length < 6 && 
-                                                <div className="option-textarea-inner add-options ng-star-inserted"><button type="button" onClick={this.addMoreOption}><span>+</span><span>Add More Options</span></button></div>
+                                                <div className="option-textarea-inner add-options "><button type="button" onClick={this.addMoreOption}><span>+</span><span>Add More Options</span></button></div>
                                             }
                                         </div>
                                     </div>

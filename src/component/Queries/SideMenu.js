@@ -55,7 +55,7 @@ export default class SideMenu extends React.Component {
                                 <li className={(filter === 1) ? 'active' : ''}><Link to="/queries/general">All Queries</Link></li>
                             </ul>
                         </li>
-                        <li className={'menu-items ' + (component === 'myquery' && 'active')}>
+                        <li className={'menu-items ' + ((component === 'myquery' || component === 'editquery') && 'active')}>
                             <Link to="/my-query">
                                 <img src={questionmark} className="sidebar-icon" />
                                 <img src={hoverquestionmark} className="sidebar-icon hover-icon" /> My Queries
