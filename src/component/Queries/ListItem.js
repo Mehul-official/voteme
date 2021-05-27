@@ -1,19 +1,8 @@
 import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import ProgressBar from 'react-bootstrap/ProgressBar';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import * as Queries from '../../services/Queries';
 import * as User from '../User/UserDetails';
-import uparrowoutline from '../../assets/images/up-arrow-outline.svg';
-import uparrowfill from '../../assets/images/up-arrow-fill.svg';
-import downarrowoutline from '../../assets/images/down-arrow-outline.svg';
-import downarrowfill from '../../assets/images/down-arrow-fill.svg';
-import speechbubbleoutline from '../../assets/images/speech-bubble-outline.svg';
-import viewoutline from '../../assets/images/view-outline.svg';
-import shareoutline from '../../assets/images/share-outline.svg';
-import more from '../../assets/images/more.png';
-import edit_btn from '../../assets/images/edit.svg'; 
-import delete_btn from '../../assets/images/delete.svg';
+import QueryItem from './QueryItem';
 
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
@@ -55,41 +44,7 @@ export default class ListItem extends React.Component {
             this.setState({ listCategoryShow: _id });
         }
     }
-    actionButton = (_id, action) => {
-        const { QueriesList } = this.state;
-        QueriesList.map((Query) => {
-            if (_id === Query._id) {
-                if (action === 'like' && (Query.Like === null || Query.Like === false)) {
-                    if (Query.Like === false) {
-                        Query.TotalDisLikes = Query.TotalDisLikes-1;
-                    }
-                    Query.Like = action = true;
-                    Query.TotalLikes = Query.TotalLikes+1;
-                } else if (action === 'like' && Query.Like === true) {
-                    Query.Like = action = null;
-                    Query.TotalLikes = Query.TotalLikes-1;
-                } else if (action === 'dislike' && (Query.Like === null || Query.Like === true)) {
-                    if (Query.Like === true) {
-                        Query.TotalLikes = Query.TotalLikes-1;
-                    }
-                    Query.Like = action = false;
-                    Query.TotalDisLikes = Query.TotalDisLikes+1;
-                } else if (action === 'dislike' && Query.Like === false) {
-                    Query.Like = action = null;
-                    Query.TotalDisLikes = Query.TotalDisLikes-1;
-                }
-            }
-        });
-        this.setState({
-            QueriesList : QueriesList,
-        });
-        Queries.likeordislike({
-            "Like":action,
-            "LikedBy":user_id
-        }, _id).then(
-            result => result
-        )
-    }
+    
     render() {
         const { Page, TotalRecords, QueriesList } = this.state;
         return(
@@ -102,94 +57,8 @@ export default class ListItem extends React.Component {
                 scrollableTarget="scrollableDiv"
                 loader={<h4>Loading...</h4>}
                 >
-                    {QueriesList !== '' && QueriesList.map((Query, key) => (           
-                        <div key={key} className="query-info-box ">
-                            <div className="query-head flex-box ">
-                                <span className="profile-img " style={{backgroundImage : (Query.UserDetails && Query.UserDetails[0].Image) ? "url('"+Query.UserDetails[0].Image+"')": ''}}></span>
-                                <div className="about-query-info">
-                                    <div className="small-title">{Query.UserDetails[0].FirstName} {Query.UserDetails[0].LastName} </div>
-                                    <div className="query-shared-by">
-                                    {Query.Category.slice(0, 2).length > 0 && Query.Category.slice(0, 2).map((Category, key) => (
-                                        <span key={key} className="">
-                                            <span className=""> {Category},  </span>
-                                        </span>
-                                    ))}
-
-                                    {Query.Category.slice(2).length > 0 && 
-                                        <span className="">
-                                            <span className="cat-view-more " style={{color: 'dodgerblue', cursor: 'pointer'}}>
-                                                <span style={{display: 'none'}} id={'hide'+Query._id}>Hide!</span>
-                                                <span id={'view'+Query._id} onClick={() => this.toggleCatList(Query._id)}>View More!</span>
-                                                <span className="category-dropdown" style={{display: this.state.listCategoryShow !== '' && this.state.listCategoryShow === Query._id ? 'block' : 'none'}} id={Query._id}>
-                                                    {Query.Category.slice(2).map((Category, key) => (
-                                                        <span key={key} className=""> {Category} </span>
-                                                    ))}
-                                                </span>
-                                            </span>
-                                        </span>
-                                    }
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="query-desc">
-                                <div className="query-has-img d-flex">
-                                    <h2 className="small-title"><Link style={{cursor: 'pointer'}} to={'/queries-detail/'+Query._id}>{Query.Query}</Link></h2>
-                                </div>
-                                <ul className="query-options ">
-                                    {Query.Options[0].Options !== '' && Query.Options[0].Options.map((Ans, key) => (
-                                        <li key={key} className="">
-                                            {Ans.Key}. {Ans.Answer}
-                                            {this.props.userId === Query.UserId || Query.IsVoted === true ? <ProgressBar now={Ans.Percentage} srOnly /> : '' }
-                                            <span>{this.props.userId === Query.UserId || Query.IsVoted === true ? Math.round(Ans.Percentage)+'%' : ''} </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div className="query-footer flex-box">
-                                <div className="submit-btn ">
-                                    <span className=""><button type="button" className="desabel-btn">VOTE ME</button></span>
-                                </div>
-                                
-                                <div className="bottom-right-options" id={"query_"+Query._id}>
-                                    <span className="like " onClick={() => this.actionButton(Query._id,'like')}>
-                                        <img alt="smile" src={uparrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === false ? 'block' : 'none'}} />
-                                        <img alt="smile" src={uparrowfill} className="fill-icon" style={{display : Query.Like === true ? 'block' : 'none' }}/> {Query.Like} {Query.TotalLikes}
-                                    </span>
-                                    <span className="dislike " onClick={() => this.actionButton(Query._id,'dislike')}>
-                                        <img alt="smile" src={downarrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === true ? 'block' : 'none'}} /> 
-                                        <img alt="smile" src={downarrowfill} className="fill-icon" style={{display : Query.Like === false ? 'block' : 'none'}} /> {Query.TotalDisLikes}
-                                    </span>
-                                    <span className="comments">
-                                        <img alt="smile" src={speechbubbleoutline} />{Query.TotalComments}
-                                    </span>
-                                    <span className="viewers">
-                                        <img alt="smile" src={viewoutline} /> {Query.TotalViews}
-                                    </span>
-                                    <span className="share">
-                                        <img alt="smile" src={shareoutline} />
-                                    </span>
-                                    <span className="more-opt " id={"report_"+Query._id}>
-                                        <img alt="smile" src={more} />
-                                        <div className="report-pop"><a href="#">Report</a></div>
-                                    </span>
-                                </div>
-                            </div>
-                            <span className="">
-                                {Query.IsEnded === true ? <div className="poll-end-time poll-ended">Poll Ended</div> : <div className="poll-end-time">Poll End Time - {Query.EndDate}</div> }
-                                <div className="right-vote-info ">{Query.TotalVotes} Vote</div>
-                                {(this.props.component && this.props.component === 'MyQuery' && Query.IsEnded === false) && 
-                                    <div className="query-cta-btns">
-                                        <span className="edit ">
-                                            <Link className="edit-btn" to={'/edit-query/'+Query._id}><img src={edit_btn} alt="smile" /></Link>
-                                        </span>
-                                        <span className="delete ">
-                                            <img src={delete_btn} alt="smile" />
-                                        </span>
-                                    </div>
-                                }
-                            </span>
-                        </div>
+                    {QueriesList !== '' && QueriesList.map((Query, key) => (
+                        <QueryItem key={key} Query={Query} userId={user_id} component={(this.props.component && this.props.component !== '') && this.props.component}/>
                     ))}
                 </InfiniteScroll>
             </div>

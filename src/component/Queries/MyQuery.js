@@ -58,10 +58,10 @@ export default class List extends React.Component {
                             <div className="query-tabing">
                                 <div className="tab-listing">
                                     <ul className="tabbing-nav">
-                                        <li className={this.state.searchBy == 2 && 'active-tab'}><Link onClick={this.filterMyQuery} id={2}>Recent Queries</Link></li>
-                                        <li className={this.state.searchBy == 3 && 'active-tab'}><Link onClick={this.filterMyQuery} id={3}>Top 10 Queries</Link></li>
-                                        <li className={this.state.searchBy == 4 && 'active-tab'}><Link onClick={this.filterMyQuery} id={4}>Popular Queries</Link></li>
-                                        <li className={this.state.searchBy == 1 && 'active-tab'}><Link onClick={this.filterMyQuery} id={1}>All Queries</Link></li>
+                                        <li className={this.state.searchBy == 2 && 'active-tab'}><a onClick={this.filterMyQuery} id={2}>Recent Queries</a></li>
+                                        <li className={this.state.searchBy == 3 && 'active-tab'}><a onClick={this.filterMyQuery} id={3}>Top 10 Queries</a></li>
+                                        <li className={this.state.searchBy == 4 && 'active-tab'}><a onClick={this.filterMyQuery} id={4}>Popular Queries</a></li>
+                                        <li className={this.state.searchBy == 1 && 'active-tab'}><a onClick={this.filterMyQuery} id={1}>All Queries</a></li>
                                     </ul>
                                 </div>
                                 <div className="tabs-content-cover">

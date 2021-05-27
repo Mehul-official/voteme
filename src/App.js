@@ -10,8 +10,6 @@ import Profile from './component/User/Profile';
 import { AddQuery, EditQuery } from './component/Queries/Query';
 import { token, tokenExpireIn } from './component/User/UserDetails';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
-import { Form } from 'react-bootstrap';
-
 
 require('dotenv').config();
 process.env.CI = false;
@@ -73,7 +71,7 @@ function App() {
             <Footer />
           </Route>
 
-          <Route path="/query-detail/:id">
+          <Route exact path="/query-detail/:id">
             <Header />
               {(token !== undefined && token !== '' && token !== false) ? <QueryDetail /> : <Redirect to="/" />}
             <Footer />

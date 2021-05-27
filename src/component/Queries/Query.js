@@ -8,6 +8,12 @@ import Datetime from 'react-datetime';
 import moment from 'moment';
 import confetti from '../../assets/images/confetti.gif';
 import check_circle1 from '../../assets/images/check-circle1.gif';
+import file from '../../assets/images/file.svg';
+import pie_chart from '../../assets/images/pie-chart.png';
+import bar_chart from '../../assets/images/bar-chart.jpg';
+import line_chart from '../../assets/images/lin-chart.jpg';
+import donut_chart from '../../assets/images/donut-chart.png';
+
 import { AllCategories } from './Categories';
 
 
@@ -33,8 +39,9 @@ export class AddQuery extends React.Component {
         this.state = {
             id : (props.id && props.id !== '') ? props.id : '',
             query: (props.queryDetail && props.queryDetail.Query !== '') ? props.queryDetail.Query : '',
-            showCategoryErrorModal: 'none',
+            showErrorModal: 'none',
             showQuerySuccess: 'none',
+            queryError: '',
             categories_list: '',
             queryImageFile : '',
             queryImageUrl: props.queryDetail && props.queryDetail.File ? props.queryDetail.File : '',
@@ -141,11 +148,11 @@ export class AddQuery extends React.Component {
         }
     }
     submitForm = async () => { 
-        const { options, query, queryImageFile, IsPublic, EndDate, ChartOption, Category, id } = this.state;
+        const { showQueryError, queryError, options, query, queryImageFile, IsPublic, EndDate, ChartOption, Category, id } = this.state;
         let postArr = {
             "UserID": User.user_id,
             "IsPublic": IsPublic,
-            "EndDate": EndDate,
+            "EndDate": (this.props.action && this.props.action === 'editquery') ? EndDate : moment(EndDate).format('DD/MM/YYYY HH:mm A'),
             "OptionType": "1",
             "ChartOption": ChartOption
         };
@@ -153,7 +160,7 @@ export class AddQuery extends React.Component {
         if (Category.length > 0) {
             postArr.Category = Category.join(',')
         } else {
-            this.setState({ showCategoryErrorModal : 'block' });
+            this.setState({ showErrorModal : 'block', queryError:'Please select Category for your QUERY!' });
             return false;
         }
         query !== '' && (postArr.Query = query);
@@ -175,6 +182,7 @@ export class AddQuery extends React.Component {
         for (let i = 0; i < postArr_keys.length; i++) {
             formData.append(postArr_keys[i], postArr_values[i]);
         }
+
         if (this.props.action && this.props.action === 'editquery') {
             Queries.edit_query(this.state.id, formData).then(
                 result => {
@@ -188,7 +196,9 @@ export class AddQuery extends React.Component {
                 result => {
                     if (result.Status === "Success") {
                         this.setState({ showQuerySuccess : 'block' });
-                    } 
+                    } else {
+                        this.setState({ showErrorModal : 'block', queryError : result.Error.Message });
+                    }
                 }
             )
         }
@@ -214,7 +224,7 @@ export class AddQuery extends React.Component {
         )
     }
     render() {
-        const { queryImageFile, queryImageUrl, options, errors, ChartOption, EndDate, IsPublic, Category, categories_list, showCategoryErrorModal, showQuerySuccess } = this.state;
+        const { queryImageFile, queryImageUrl, options, errors, ChartOption, EndDate, IsPublic, Category, categories_list, showErrorModal, queryError, showQuerySuccess } = this.state;
         const alphabetArr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
         return(
             <section className="query-banner-img">
@@ -244,7 +254,7 @@ export class AddQuery extends React.Component {
                                                 }
                                                 <div className={(errors.query != null && errors.query.length > 0 && "cross-validation-error") + " browse-img"}>
                                                     <input id="QueryFile" type="file" onChange={this.changeQueryImage} />
-                                                    <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
+                                                    <label><img alt="smile" src={file} /></label>
                                                 </div>
                                                 <textarea placeholder="Write your query here..." formcontrolname="query" name="query" className="full-height" defaultValue={this.state.query} onChange={this.handleChange}></textarea>
                                             </div>
@@ -267,7 +277,7 @@ export class AddQuery extends React.Component {
                                                     }
                                                     <div className={(errors.options[key] != null && errors.options[key].length > 0 && "cross-validation-error") + " browse-img"} >
                                                         <input id="OptionOneFile" type="file" name={key} onChange={this.changeOptionInfo} />
-                                                        <label><img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/file.svg"} /></label>
+                                                        <label><img alt="smile" src={file} /></label>
                                                     </div>
                                                     <textarea placeholder={'Option '+alphabetArr[key]+'.'} name={key} className="full-height"  defaultValue={(option.Answer) ? option.Answer : options.value} onChange={this.changeOptionInfo}></textarea>
                                                     {key > 1 && 
@@ -290,28 +300,28 @@ export class AddQuery extends React.Component {
                                             <div className="select-box-inner">
                                                 <input id="pieChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="2" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "2" && true}/>
                                                 <label htmlFor="pieChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/pie-chart.png"} />
+                                                    <img alt="smile" src={pie_chart} />
                                                     <span>Pie Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
                                                 <input id="barChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="1" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "1" && true}/>
                                                 <label htmlFor="barChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/bar-chart.jpg"} />
+                                                    <img alt="smile" src={bar_chart} />
                                                     <span>Bar Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
                                                 <input id="lineChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="3" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "3" && true}/>
                                                 <label htmlFor="lineChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/lin-chart.jpg"} />
+                                                    <img alt="smile" src={line_chart} />
                                                     <span>Line Chart</span>
                                                 </label>
                                             </div>
                                             <div className="select-box-inner">
                                                 <input id="donutChart" formcontrolname="ChartOption" name="ChartOption" type="radio" value="4" className="ChartOption" onChange={this.handleChange} defaultChecked={ChartOption === "4" && true}/>
                                                 <label htmlFor="donutChart">
-                                                    <img alt="smile" src={process.env.REACT_APP_BASE_URL+"src/assets/images/donut-chart.png"} />
+                                                    <img alt="smile" src={donut_chart} />
                                                     <span>Donut Chart</span>
                                                 </label>
                                             </div>
@@ -354,21 +364,21 @@ export class AddQuery extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="swal2-container swal2-center swal2-backdrop-show" style={{overflowY: "auto", display : showCategoryErrorModal}}>
+                <div className="swal2-container swal2-center swal2-backdrop-show" style={{overflowY: "auto", display : showErrorModal}}>
                     <div aria-labelledby="swal2-title" aria-describedby="swal2-content" className="swal2-popup swal2-modal swal2-icon-info swal2-show" tabIndex="-1" role="dialog" aria-live="assertive" aria-modal="true" style={{display: "flex"}}>
                         <div className="swal2-header">
                             <div className="swal2-icon swal2-info swal2-icon-show" style={{display: "flex"}}>
                                 <div className="swal2-icon-content">i</div>
                             </div>
                             <h2 className="swal2-title" id="swal2-title" style={{display: "flex"}}>Whoops..</h2>
-                            <button type="button" className="swal2-close" aria-label="Close this dialog" style={{display: "none"}}>×</button>
+                            <button type="button" className="swal2-close" aria-label="Close this dialog" onClick={() => this.setState({ showErrorModal : 'none', queryError: '' })}>×</button>
                         </div>
                         <div className="swal2-content">
-                            <div id="swal2-content" className="swal2-html-container" style={{display: "block"}}>Please select Category for your QUERY!</div>
+                            <div id="swal2-content" className="swal2-html-container" style={{display: "block"}}>{queryError}</div>
                         </div>
                         <div className="swal2-actions">
                             <div className="swal2-loader"></div>
-                            <button type="button" className="swal2-confirm swal2-styled" aria-label="" style={{display: "inline-block", borderLeftColor: "rgb(48, 133, 214)", borderRightColor: "rgb(48, 133, 214)"}} onClick={() => this.setState({ showCategoryErrorModal : 'none' })}>OK</button>
+                            <button type="button" className="swal2-confirm swal2-styled" aria-label="" style={{display: "inline-block", borderLeftColor: "rgb(48, 133, 214)", borderRightColor: "rgb(48, 133, 214)"}} onClick={() => this.setState({ showErrorModal : 'none', queryError: '' })}>OK</button>
                         </div>
                     </div>
                 </div>
