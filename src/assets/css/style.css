@@ -387,6 +387,8 @@ ul {
 
 /*----------VoteME App Steps-----------*/
 
+
+
 .how-it-works {
     position: relative;
     background: #f8f8f8;
@@ -2309,6 +2311,7 @@ footer {
     font-weight: 600;
     box-shadow: 0 0 3px #6f6f6f;
     margin: auto auto -1px;
+    cursor: pointer;
 }
 .voting-box-show .click-to-vote-btn > img {
     display: block;
@@ -2685,6 +2688,10 @@ footer {
 .edit-profile-form .validation-msg {
     text-align: left;
 }
+.coment-section .errorBox {
+    position: relative;
+    text-align: left;
+}
 .edit-profile-info .edit_name {
     cursor: pointer;
 }
@@ -2693,6 +2700,11 @@ footer {
 }
 .add-more-info .form-field.validation-error {
     margin-bottom: 35px;
+}
+.back_button a {
+    display: inline-block;
+    padding: 0 0 10px;
+    color: #2e3d44;
 }
 
 /*------------Category Popup-------------*/
@@ -5505,7 +5517,7 @@ footer {
     .comments-list .profile-img img {width: 32px; }
     .coment-section {margin: 20px -15px; padding: 10px; }
     .comment-cta {margin-top: 10px; }
-    .click-to-vote-btn a {padding: 8px 10px; font-size: 13px; }
+    .click-to-vote-btn a {padding: 8px 10px; font-size: 13px; cursor: pointer; }
     .query-desc .query-chart .select-box-inner {width: 100%; margin-right: 0 !important; margin-bottom: 15px; }
     .voting-box-show {margin-top: 20px;}
     .comments-list-inner .about-query-info {width: 80%; }

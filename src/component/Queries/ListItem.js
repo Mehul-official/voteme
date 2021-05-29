@@ -15,7 +15,6 @@ export default class ListItem extends React.Component {
             Page : 1,
             start : 10,
             end : 20,
-            listCategoryShow : '',
             TotalRecords : ''
         }
     }
@@ -37,13 +36,7 @@ export default class ListItem extends React.Component {
             QueriesList : this.props.QueriesList.slice(0, 10),
         });
     }
-    toggleCatList = (_id) => {
-        if (this.state.listCategoryShow === _id) {
-            this.setState({ listCategoryShow: '' });
-        } else {
-            this.setState({ listCategoryShow: _id });
-        }
-    }
+   
     
     render() {
         const { Page, TotalRecords, QueriesList } = this.state;

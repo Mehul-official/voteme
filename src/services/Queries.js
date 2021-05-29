@@ -55,6 +55,19 @@ export const update_user_category = (query) =>
     .then((res) => res.json())
     .then((result) => result)
 
+export const give_vote = (query) => 
+    fetch(`${api}/givevote`, { 
+        method: 'post',
+        headers: {
+            ...headers,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(query)
+    })
+    .then((res) => res.json())
+    .then((result) => result)    
+
 export const get_query = (query) => 
     fetch(`${api}/query?${query}`, { 
         method: 'get',
@@ -80,6 +93,31 @@ export const get_query_by_id = (id) =>
     .then((res) => res.json())
     .then((result) => result)    
 
+export const get_comments = (queryId, query) => 
+    fetch(`${api}/${queryId}/getComments?${query}`, { 
+        method: 'get',
+        headers: {
+            ...headers,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+    })
+    .then((res) => res.json())
+    .then((result) => result)
+
+export const give_comment = (queryId, query) => 
+    fetch(`${api}/${queryId}/createComments`, { 
+        method: 'post',
+        headers: {
+            ...headers,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(query)
+    })
+    .then((res) => res.json())
+    .then((result) => result)
+
 export const get_my_query = (query) => 
     fetch(`${api}/myquery?${query}`, { 
         method: 'get',
@@ -91,7 +129,8 @@ export const get_my_query = (query) =>
     })
     .then((res) => res.json())
     .then((result) => result)
-    
+
+
 export const likeordislike = (query, query_id) => 
     fetch(`${api}/${query_id}/likeordislike`, { 
         method: 'post',

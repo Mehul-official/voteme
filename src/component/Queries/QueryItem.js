@@ -16,17 +16,43 @@ import more from '../../assets/images/more.png';
 import edit_btn from '../../assets/images/edit.svg'; 
 import delete_btn from '../../assets/images/delete.svg';
 import search_plus from '../../assets/images/search-plus.svg';
+import Comment from './Comments';
+import { ConfirmModal, SuccessModal, ErrorModal } from '../common/Modal';
 
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
+
+const numberWordsArr = {
+    '0' : 'One',
+    '1' : 'Two',
+    '2' : 'Three',
+    '3' : 'Four',
+    '4' : 'Five',
+    '5' : 'Six',
+};
 
 export default class QueryItem extends React.Component {
     constructor(props) {
         super();
         this.state = {
             Query : props.Query,
+            showConfirmation : false,
+            showSuccessModal : false,
+            showErrorModal : false,
+            queryId : props.queryId,
+            modalOpen : false,
+            successModalLabel : '',
+            errorModalLabel : '',
+            optionAnswer : '',
+            addOptionId : '',
+            commentTextBox : '',
+            listCategoryShow : '',
+            errors : {
+                commentTextBox : ''
+            }
         }
     }
+   
     actionButton = (_id, action) => {
         const { Query } = this.state;
       
@@ -62,11 +88,69 @@ export default class QueryItem extends React.Component {
             result => result
         )
     }
+    voteOptionHandle = (optionId, optionAnswer) => {
+        this.setState({
+            optionAnswer : optionAnswer,
+            addOptionId : optionId,
+            showConfirmation : true,
+            showErrorModal : false,
+            showSuccessModal : false,
+            modalOpen : true,
+        });
+    }
+    showSuccess = (arr = '') => {
+        this.setState({
+            showConfirmation : false,
+            showErrorModal : false,
+            showSuccessModal : true,
+            modalOpen : true,
+            successModalLabel : arr.successModalLabel !== '' ? arr.successModalLabel : ''
+        });
+    }
+    showError = (arr = '') => {
+        this.setState({
+            showConfirmation : false,
+            showSuccessModal : false,
+            showErrorModal : true,
+            modalOpen : true,
+            errorModalLabel : arr.errorModalLabel !== '' ? arr.errorModalLabel : ''
+        });
+    }
+    closeModal = () => {
+        this.setState({
+            modalOpen: false
+        });
+    }
+    addVoteOption = () => {
+        const { addOptionId, queryId, optionAnswer } = this.state;
+        let postArr = {
+            UserID : user_id,
+            QueryId : queryId,
+            OptionId : addOptionId
+        };
+        Queries.give_vote(postArr).then(
+            result => {
+                if (result.Status === "Success") {
+                    this.showSuccess({successModalLabel : 'Query Created Successfully!'});
+                } else {
+                    this.showError({successModalLabel : result.Error.Message});
+                }
+            }
+        )
+    }
+    toggleCatList = (_id) => {
+        if (this.state.listCategoryShow === _id) {
+            this.setState({ listCategoryShow: '' });
+        } else {
+            this.setState({ listCategoryShow: _id });
+        }
+    }
+
     render() {
-        const { Query } = this.state;
+        const { commentTextBox, Query, errors, addOptionId, queryId, optionAnswer, modalOpen, showConfirmation, showSuccessModal, showErrorModal, successModalLabel, errorModalLabel } = this.state;
         let userDetail = (Array.isArray(Query.UserDetails) === true) ? Query.UserDetails[0] : Query.UserDetails;
         let Category, Options = '';
-        console.log(Query.Category);
+        
         if (this.props.component === "query-detail") {
             Options = Query.Options;
             Category = Query.Category.map(Category => Category.CategoryName);
@@ -74,7 +158,6 @@ export default class QueryItem extends React.Component {
             Options = Query.Options[0].Options;
             Category = Query.Category;
         }
-        
         return(
             <div className="query-info-box ">
                 <div className="query-head flex-box ">
@@ -83,7 +166,6 @@ export default class QueryItem extends React.Component {
                         <div className="small-title">{userDetail.FirstName} {userDetail.LastName} </div>
                         <div className="query-shared-by">
                             {Category.slice(0, 2).length > 0 && Category.slice(0, 2).map((Category, key) => (
-                                
                                 <span key={key} className="">
                                     <span className=""> {Category},  </span>
                                 </span>
@@ -105,8 +187,6 @@ export default class QueryItem extends React.Component {
                         </div>
                     </div>
                 </div>
-                
-
                 <div className="query-desc">
                     <div className="query-has-img d-flex">
                         {Query.ThumbnailURL !== '' &&
@@ -119,62 +199,28 @@ export default class QueryItem extends React.Component {
                     {(this.props.component === "query-detail") ? 
                         <div className="query-chart">
                             <div className="voting-chart-cover">
-                                <div className="chart-img"></div>
-                            </div>
-                            <div className="custom-select-box voting-box-show">
-                                <div className="select-box-inner select-text">
-                                    <div className="select-box-main">
-                                        <div className="d-flex q-desc-with-img">
-                                            <span className="query-dec-text">Opt A</span>
-                                            <div className="click-to-vote-btn">
-                                                <img src={search_plus} style={{cursor: "pointer"}} />
-                                                <a className="">Click to Vote</a>
-                                            </div>
-                                        </div>
-                                        <div className="category-popup query-details-popup">
-                                            <div className="custom-model-main" id="confirmVote_60add71c6cc8e75879e7f357">
-                                                <div className="vote-popup-box">
-                                                    <div className="close-btn">×</div>
-                                                    <div className="vote-popup-inner">
-                                                        <span className=""></span>
-                                                        <div className="vote-popup-desc">Are you want to confirm vote for <span>"Opt A" ?</span></div>
-                                                        <div className="popup-btn-grp flex-box submit-btn">
-                                                        <button type="button vote">Vote</button>
-                                                        <button type="button" className="btn-cancel">Cancel</button>
-                                                        </div>
+                                <div className="custom-select-box voting-box-show">
+                                    {Options !== '' && Options.map((option, key) => (
+                                        <div className="select-box-inner select-text" key={key}>
+                                            <div className={option.IsOptionVoted ? 'select-box-main voted' : 'select-box-main' }>
+                                                {Query.IsVoted === true && <div className="vote-count-box">{option.VotedBy.length} Vote</div> }
+                                                <div className="d-flex q-desc-with-img">
+                                                    {(option['Option'+numberWordsArr[key]+'ThumbnailURL'] && option['Option'+numberWordsArr[key]+'ThumbnailURL'] !== '') &&
+                                                        <span className="qry-opt">
+                                                            <img src={option['Option'+numberWordsArr[key]+'ThumbnailURL']} />
+                                                        </span>
+                                                    }
+                                                    {(option.Answer && option.Answer !== '') &&
+                                                        <span className="query-dec-text"> {option.Answer} </span>
+                                                    }
+                                                    <div className="click-to-vote-btn">
+                                                        <img src={search_plus} style={{cursor: "pointer"}} />
+                                                        {(Query.IsEnded === false && Query.Isvoted === false) && <a className="" onClick={() => this.voteOptionHandle(option._id, option.Answer)}>Click to Vote</a>}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className="select-box-inner select-text">
-                                    <div className="select-box-main">
-                                        <div className="d-flex q-desc-with-img">
-                                        <span className="query-dec-text">
-                                            Opt B
-                                        </span>
-                                        <div className="click-to-vote-btn">
-                                            <img src={search_plus} style={{cursor: "pointer"}} />
-                                            <a className="">Click to Vote</a>
-                                        </div>
-                                        </div>
-                                        <div className="category-popup query-details-popup">
-                                            <div className="custom-model-main" id="confirmVote_60add71c6cc8e75879e7f358">
-                                                <div className="vote-popup-box">
-                                                    <div className="close-btn">×</div>
-                                                    <div className="vote-popup-inner">
-                                                        <span className=""></span>
-                                                        <div className="vote-popup-desc">Are you want to confirm vote for <span>"Opt B" ?</span></div>
-                                                        <div className="popup-btn-grp flex-box submit-btn">
-                                                        <button type="button vote">Vote</button>
-                                                        <button type="button" className="btn-cancel">Cancel</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>    
@@ -189,51 +235,83 @@ export default class QueryItem extends React.Component {
                             ))}
                         </ul>
                     }
-                </div>
+
                 
-                <div className="query-footer flex-box">
-                    <div className="submit-btn ">
-                        <span className=""><button type="button" className="desabel-btn">VOTE ME</button></span>
-                    </div>
-                    
-                    <div className="bottom-right-options" id={"query_"+Query._id}>
-                        <span className="like " onClick={() => this.actionButton(Query._id,'like')}>
-                            <img alt="smile" src={uparrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === false ? 'block' : 'none'}} />
-                            <img alt="smile" src={uparrowfill} className="fill-icon" style={{display : Query.Like === true ? 'block' : 'none' }}/> {Query.Like} {Query.TotalLikes}
-                        </span>
-                        <span className="dislike " onClick={() => this.actionButton(Query._id,'dislike')}>
-                            <img alt="smile" src={downarrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === true ? 'block' : 'none'}} /> 
-                            <img alt="smile" src={downarrowfill} className="fill-icon" style={{display : Query.Like === false ? 'block' : 'none'}} /> {Query.TotalDisLikes}
-                        </span>
-                        <span className="comments">
-                            <img alt="smile" src={speechbubbleoutline} />{Query.TotalComments}
-                        </span>
-                        <span className="viewers">
-                            <img alt="smile" src={viewoutline} /> {Query.TotalViews}
-                        </span>
-                        <span className="share">
-                            <img alt="smile" src={shareoutline} />
-                        </span>
-                        <span className="more-opt " id={"report_"+Query._id}>
-                            <img alt="smile" src={more} />
-                            <div className="report-pop"><a href="#">Report</a></div>
-                        </span>
-                    </div>
-                </div>
-                <span className="">
-                    {Query.IsEnded === true ? <div className="poll-end-time poll-ended">Poll Ended</div> : <div className="poll-end-time">Poll End Time - {Query.EndDate}</div> }
-                    <div className="right-vote-info ">{Query.TotalVotes} Vote</div>
-                    {(this.props.component && this.props.component === 'MyQuery' && Query.IsEnded === false) && 
-                        <div className="query-cta-btns">
-                            <span className="edit ">
-                                <Link className="edit-btn" to={'/edit-query/'+Query._id}><img src={edit_btn} alt="smile" /></Link>
+                    <div className="query-footer flex-box">
+                        {(this.props.component !== "query-detail") &&
+                                <div className="submit-btn ">
+                                    <span className=""><button type="button" className="desabel-btn">VOTE ME</button></span>
+                                </div>
+                        }
+                        
+                        <div className="bottom-right-options" id={"query_"+Query._id}>
+                            <span className="like " onClick={() => this.actionButton(Query._id,'like')}>
+                                <img alt="smile" src={uparrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === false ? 'block' : 'none'}} />
+                                <img alt="smile" src={uparrowfill} className="fill-icon" style={{display : Query.Like === true ? 'block' : 'none' }}/> {Query.Like} {Query.TotalLikes}
                             </span>
-                            <span className="delete ">
-                                <img src={delete_btn} alt="smile" />
+                            <span className="dislike " onClick={() => this.actionButton(Query._id,'dislike')}>
+                                <img alt="smile" src={downarrowoutline} className="outline-icon" style={{display : Query.Like === null || Query.Like === true ? 'block' : 'none'}} /> 
+                                <img alt="smile" src={downarrowfill} className="fill-icon" style={{display : Query.Like === false ? 'block' : 'none'}} /> {Query.TotalDisLikes}
+                            </span>
+                            <span className="comments">
+                                <img alt="smile" src={speechbubbleoutline} />{Query.TotalComments}
+                            </span>
+                            <span className="viewers">
+                                <img alt="smile" src={viewoutline} /> {Query.TotalViews}
+                            </span>
+                            <span className="share">
+                                <img alt="smile" src={shareoutline} />
+                            </span>
+                            <span className="more-opt " id={"report_"+Query._id}>
+                                <img alt="smile" src={more} />
+                                <div className="report-pop"><a href="#">Report</a></div>
                             </span>
                         </div>
-                    }
-                </span>
+                    </div>
+                </div>
+                {Query.IsEnded === true ? <div className="poll-end-time poll-ended">Poll Ended</div> : <div className="poll-end-time">Poll End Time - {Query.EndDate}</div> }
+                <div className="right-vote-info ">{Query.TotalVotes} Vote</div>
+                {(this.props.component && this.props.component === 'MyQuery' && Query.IsEnded === false) && 
+                    <div className="query-cta-btns">
+                        <span className="edit ">
+                            <Link className="edit-btn" to={'/edit-query/'+Query._id}><img src={edit_btn} alt="smile" /></Link>
+                        </span>
+                        <span className="delete ">
+                            <img src={delete_btn} alt="smile" />
+                        </span>
+                    </div>
+                }
+               
+                {(this.props.component === "query-detail") &&
+                    <Comment queryId={queryId} successFun={this.showSuccess} errorFun={this.showError}/>
+                }
+                {showConfirmation === true &&
+                    <ConfirmModal
+                        Label={'Are you want to confirm vote for "'+optionAnswer+'" ? '}
+                        handlerFun={this.addVoteOption}
+                        modalOpen={modalOpen}
+                        handlerCloseModal={this.closeModal}
+                        yesOption={'Vote'}
+                        noOption={'Cancel'}
+                    ></ConfirmModal>
+                }
+                {showSuccessModal === true &&
+                    <SuccessModal
+                        Label={successModalLabel}
+                        modalOpen={modalOpen}
+                        handlerCloseModal={this.closeModal}
+                        yesOption={'OK'}
+                    ></SuccessModal>
+                }
+                {showErrorModal === true &&
+                    <ErrorModal
+                        Label={errorModalLabel}
+                        handlerFun={this.addVoteOption}
+                        modalOpen={modalOpen}
+                        handlerCloseModal={this.closeModal}
+                        yesOption={'OK'}
+                    ></ErrorModal>
+                }
             </div>
         )
     }

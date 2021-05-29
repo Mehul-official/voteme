@@ -3,7 +3,6 @@ import * as Queries from '../../services/Queries';
 import * as User from '../User/UserDetails';
 import SideMenu from './SideMenu';
 import { Link, withRouter } from 'react-router-dom';
-import search_plus from '../../assets/images/search-plus.svg';
 import QueryItem from './QueryItem';
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
@@ -13,6 +12,7 @@ class QueryDetail extends React.Component {
         super();
         this.state = {
             IsLoaded : false,
+            QueryId : '',
             Query : ''
         }
     }
@@ -22,6 +22,7 @@ class QueryDetail extends React.Component {
             result => {
                 if (result.Status === "Success") {
                     this.setState({
+                        QueryId : id,
                         Query : result.Data,
                         IsLoaded : true
                     })
@@ -30,7 +31,7 @@ class QueryDetail extends React.Component {
         )
     }
     render() {
-        const { Query, IsLoaded } = this.state;
+        const { Query, IsLoaded, QueryId } = this.state;
         
         if (!IsLoaded) {
             return(<div>'Loading.....'</div>);
@@ -45,7 +46,7 @@ class QueryDetail extends React.Component {
                                     <Link to="/queries"><i className="fa fa-chevron-left"></i>Back</Link>
                                 </div>
 
-                                <QueryItem Query={Query} userId={user_id} component={'query-detail'}/>
+                                <QueryItem Query={Query} userId={user_id} component={'query-detail'} queryId={QueryId}/>
                             </div>
                         </div>
                     </div>

@@ -14,6 +14,8 @@ import bar_chart from '../../assets/images/bar-chart.jpg';
 import line_chart from '../../assets/images/lin-chart.jpg';
 import donut_chart from '../../assets/images/donut-chart.png';
 
+import Lightbox from 'react-image-lightbox';
+
 import { AllCategories } from './Categories';
 
 
@@ -286,7 +288,7 @@ export class AddQuery extends React.Component {
                                                         </div>
                                                     }
                                                 </div>
-                                                {(errors.options[key] != null && errors.options[key].length > 0) && <span className='validation-msg'>{ 'Option ' + alphabetArr[key] } { errors.options[key] }</span>}
+                                                {(errors.options[key] !== null && errors.options[key].length > 0) && <span className='validation-msg'>{ 'Option ' + alphabetArr[key] } { errors.options[key] }</span>}
                                             </div>
                                             ))}
                                             {options.length < 6 && 
