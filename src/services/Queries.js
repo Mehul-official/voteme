@@ -170,6 +170,19 @@ export const comment_likeordislike = (query, query_id, comment_id) =>
     .then((res) => res.json())
     .then((result) => result)
 
+export const visit_query = (query) => 
+    fetch(`${api}/comment/likeordislike/`, { 
+        method: 'post',
+        headers: {
+            ...headers,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(query)
+    })
+    .then((res) => res.json())
+    .then((result) => result)
+    
 // {
     
 //     let xhr = new XMLHttpRequest();

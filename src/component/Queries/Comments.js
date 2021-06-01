@@ -58,23 +58,26 @@ export default class Comment extends React.Component {
                     let commentList = (result.Data.length && result.Data[0].Records.length) ? result.Data[0].Records.slice(0, 1)[0].replay : '';
                     let replyList = (result.Data.length && result.Data[0].Records[1]) ? result.Data[0].Records.slice(1, result.Data[0].Records.length) : '';
                     
+                    // commentList.length > 0 && commentList.map(comment => {
+                    //     comment.Like === true && likesOfComments.push(comment._id); 
+                    //     replyList.map(reply => {
+                    //         if (reply._id === comment._id) {
+                    //             comment.reply = reply.replay;
+                    //             reply.replay.map(rep => {
+                    //                 rep.Like === true && likesOfComments.push(rep._id);
+                    //             });
+                    //         };
+                    //     });
+                    // });
+                        
                     commentList.length > 0 && commentList.map(comment => {
-                        comment.Like === true && likesOfComments.push(comment._id); 
-                        replyList.map(reply => {
-                            if (reply._id === comment._id) {
-                                comment.reply = reply.replay;
-                                reply.replay.map(rep => {
-                                    rep.Like === true && likesOfComments.push(rep._id);
-                                });
-                            };
-                        });
+                        replyList.length > 0 && replyList.map(reply => reply._id === comment._id && (comment.reply = reply.replay)).filter(v => v);
                     });
 
                     this.setState({
                         isLoaded : true,
                         reply : '',
                         comment : '',
-                        likesOfComments : likesOfComments,
                         commentList : commentList,
                         replyList : replyList,
                     });
