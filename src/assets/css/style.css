@@ -2688,6 +2688,9 @@ footer {
 .edit-profile-form .validation-msg {
     text-align: left;
 }
+.error {
+    position: relative;
+}
 .coment-section .errorBox {
     position: relative;
     text-align: left;

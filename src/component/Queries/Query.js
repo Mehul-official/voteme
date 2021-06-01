@@ -14,8 +14,6 @@ import bar_chart from '../../assets/images/bar-chart.jpg';
 import line_chart from '../../assets/images/lin-chart.jpg';
 import donut_chart from '../../assets/images/donut-chart.png';
 
-import Lightbox from 'react-image-lightbox';
-
 import { AllCategories } from './Categories';
 
 
@@ -30,6 +28,7 @@ const numberWordsArr = {
 
 var yesterday = moment().subtract( 1, 'day' );
 var valid = ( current ) => current.isAfter( yesterday );
+
 export class AddQuery extends React.Component {
     constructor(props = '') {
         super();
@@ -154,11 +153,11 @@ export class AddQuery extends React.Component {
         let postArr = {
             "UserID": User.user_id,
             "IsPublic": IsPublic,
-            "EndDate": (this.props.action && this.props.action === 'editquery') ? EndDate : moment(EndDate).format('DD/MM/YYYY HH:mm A'),
+            "EndDate": EndDate,
             "OptionType": "1",
             "ChartOption": ChartOption
         };
-
+ 
         if (Category.length > 0) {
             postArr.Category = Category.join(',')
         } else {
@@ -261,15 +260,15 @@ export class AddQuery extends React.Component {
                                                 <textarea placeholder="Write your query here..." formcontrolname="query" name="query" className="full-height" defaultValue={this.state.query} onChange={this.handleChange}></textarea>
                                             </div>
                                         </div>
-                                        {(errors.query != null && errors.query.length > 0) && <span className='validation-msg'>{errors.query}</span>}
+                                        {(errors.query !== null && errors.query.length > 0) && <span className='validation-msg'>{errors.query}</span>}
                                     </div>
                                     <div className="select-query-type-block">
                                         <div className="select-option-title">Add Options</div>
                                         <div className="option-textarea">
-                                            {options != '' && options.map((option, key) => ( (key < 6) &&
+                                            {options != '' && options.map((option, key) => ((key < 6) &&
                                             <div key={key} className="option-textarea-inner">
                                                 <div className="text-area-field">
-                                                    {((option['Option'+numberWordsArr[key]+'File'] && option['Option'+numberWordsArr[key]+'File'] !== undefined && option['Option'+numberWordsArr[key]+'File'] !== '') || (option.optionImage && option.optionImage.length !== '')) &&
+                                                    {((option['Option'+numberWordsArr[key]+'File'] && option['Option'+numberWordsArr[key]+'File'] !== undefined && option['Option'+numberWordsArr[key]+'File'] !== '') || (option.optionImage && option.optionImage !== '')) &&
                                                         <div className="opt-upload-file">
                                                             <img alt="smile" src={(option['Option'+numberWordsArr[key]+'File'] !=='' && option['Option'+numberWordsArr[key]+'File'] !== undefined) ? option['Option'+numberWordsArr[key]+'File'] : URL.createObjectURL(option.optionImage[0])} />
                                                             <div className="remove-selected-file" onClick={() => this.removeOptionsImage(key)}>
@@ -277,7 +276,7 @@ export class AddQuery extends React.Component {
                                                             </div>
                                                         </div>
                                                     }
-                                                    <div className={(errors.options[key] != null && errors.options[key].length > 0 && "cross-validation-error") + " browse-img"} >
+                                                    <div className={(errors.options.length > 0 && errors.options[key] != null && errors.options[key].length > 0 && "cross-validation-error") + " browse-img"} >
                                                         <input id="OptionOneFile" type="file" name={key} onChange={this.changeOptionInfo} />
                                                         <label><img alt="smile" src={file} /></label>
                                                     </div>
@@ -288,7 +287,7 @@ export class AddQuery extends React.Component {
                                                         </div>
                                                     }
                                                 </div>
-                                                {(errors.options[key] !== null && errors.options[key].length > 0) && <span className='validation-msg'>{ 'Option ' + alphabetArr[key] } { errors.options[key] }</span>}
+                                                {(errors.options.length > 0 && errors.options[key] !== undefined && errors.options[key] !== null && errors.options[key].length > 0) && <span className='validation-msg'>{ 'Option ' + alphabetArr[key] } { errors.options[key] }</span>}
                                             </div>
                                             ))}
                                             {options.length < 6 && 
@@ -347,7 +346,7 @@ export class AddQuery extends React.Component {
                                             <h2 className="section-title">Query End Time</h2>
                                             <div className="form-group">
                                                 <div className="input-group date select-date choose-calendar-picker">
-                                                    <Datetime dateFormat="DD/MM/YYYY" initialValue={EndDate} name="EndDate" isValidDate={ valid }  onChange={this.handleChange}/>
+                                                    <Datetime dateFormat="DD/MM/YYYY" initialValue={EndDate} name="EndDate" isValidDate={ valid }  onChange={this.handleChange} closeOnSelect/>
                                                 </div>
                                             </div>
                                         </div>
@@ -366,6 +365,8 @@ export class AddQuery extends React.Component {
                         </div>
                     </div>
                 </div>
+                
+                
                 <div className="swal2-container swal2-center swal2-backdrop-show" style={{overflowY: "auto", display : showErrorModal}}>
                     <div aria-labelledby="swal2-title" aria-describedby="swal2-content" className="swal2-popup swal2-modal swal2-icon-info swal2-show" tabIndex="-1" role="dialog" aria-live="assertive" aria-modal="true" style={{display: "flex"}}>
                         <div className="swal2-header">

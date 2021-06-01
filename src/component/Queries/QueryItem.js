@@ -18,6 +18,8 @@ import delete_btn from '../../assets/images/delete.svg';
 import search_plus from '../../assets/images/search-plus.svg';
 import Comment from './Comments';
 import { ConfirmModal, SuccessModal, ErrorModal } from '../common/Modal';
+import user_placeholder from '../../assets/images/user-placeholder-img.jpg';
+
 
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
@@ -161,7 +163,7 @@ export default class QueryItem extends React.Component {
         return(
             <div className="query-info-box ">
                 <div className="query-head flex-box ">
-                    <span className="profile-img " style={{backgroundImage : (userDetail && userDetail.Image) ? "url('"+userDetail.Image+"')": ''}}></span>
+                    <span className="profile-img " style={{backgroundImage : (userDetail && userDetail.Image) ? "url('"+userDetail.Image+"')": "url('"+user_placeholder+"')"}}></span>
                     <div className="about-query-info">
                         <div className="small-title">{userDetail.FirstName} {userDetail.LastName} </div>
                         <div className="query-shared-by">

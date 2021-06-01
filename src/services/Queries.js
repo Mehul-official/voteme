@@ -118,6 +118,19 @@ export const give_comment = (queryId, query) =>
     .then((res) => res.json())
     .then((result) => result)
 
+export const give_comments_reply = (queryId, commentId, reply) => 
+    fetch(`${api}/${queryId}/comment/${commentId}/reply`, { 
+        method: 'post',
+        headers: {
+            ...headers,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reply)
+    })
+    .then((res) => res.json())
+    .then((result) => result)    
+
 export const get_my_query = (query) => 
     fetch(`${api}/myquery?${query}`, { 
         method: 'get',

@@ -44,7 +44,6 @@ export class ErrorModal extends React.Component {
     }
     render() {
         const { Label, yesOption, noOption } = this.state;
-        {console.log('Label',Label)}
         let showModal = this.props.modalOpen === true ? 'block' : 'none';
         return(
             <div className="swal2-container swal2-center swal2-backdrop-show" style={{overflowY: "auto", display : showModal}}>

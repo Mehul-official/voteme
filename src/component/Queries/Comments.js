@@ -5,6 +5,13 @@ import like_outline_icon from '../../assets/images/like_outline-icon.svg';
 import like_fill_icon from '../../assets/images/like_fill-icon.svg';
 import replay_arrow from  '../../assets/images/replay-arrow.png';
 import view_reply_hover from  '../../assets/images/view-reply-hover.svg';
+import user_placeholder from '../../assets/images/user-placeholder-img.jpg';
+import more_option from '../../assets/images/more.png';
+
+import { ErrorModal } from '../common/Modal';
+
+// const Eventsemit = require('../Eventsemitor');
+// const eventsemit = new Eventsemit();
 
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
@@ -19,16 +26,22 @@ export default class Comment extends React.Component {
             replyList : '',
             Page : 1,
             Rows : 30,
-            commentTextBox : '',
+            comment : '',
+            showCommentReplys: [],
+            reply : '',
+            replyToComment : '',
+            showErrorModal : false,
+            modalOpen : false,
+            errorModalLabel : '',
             errors : {
-                commentTextBox : ''
+                comment : ''
             }
         }
     }
 
     getComments = (params = '') => {
         const { queryId } = this.state;
-
+        console.log('queryId', queryId)
         var queryParams = {
             Rows : this.state.Rows,
             PageNo : this.state.Page,
@@ -37,27 +50,54 @@ export default class Comment extends React.Component {
         if (params.PageNo && params.PageNo !== '') {
             queryParams.PageNo = params.PageNo;
         }
-        console.log('test')
         var queryParams = Object.keys(queryParams).reduce(function(a,k){a.push(k+'='+encodeURIComponent(queryParams[k]));return a},[]).join('&');
         Queries.get_comments(queryId,queryParams).then(
             result => {
                 if (result.Status === "Success") {
+
+                    let commentList = (result.Data.length && result.Data[0].Records.length) ? result.Data[0].Records.slice(0, 1)[0].replay : '';
+                    let replyList = (result.Data.length && result.Data[0].Records[1]) ? result.Data[0].Records.slice(1, result.Data[0].Records.length) : '';
+                    
+                    commentList.map(comment => {
+                        replyList.map(reply => reply._id === comment._id && (comment.reply = reply.replay)).filter(v => v);
+                    });
+
                     this.setState({
                         isLoaded : true,
-                        commentList : (result.Data.length && result.Data[0].Records.length) ? result.Data[0].Records : '',
+                        commentList : commentList,
+                        replyList : replyList,
                     });
                 }
             }
         )
     }
 
+    viewReply = (id = '') => {
+        if (id !== '') {
+            this.setState({
+                showCommentReplys : [...this.state.showCommentReplys, id]
+            })            
+        } else {
+            this.setState({
+                showErrorModal : true,
+                modalOpen : true,
+                errorModalLabel : 'No REPLIES are there for this COMMENT!',
+            })
+        }
+    }
+    handleReplyToComment = (id) => {
+        this.setState({
+            replyToComment : id
+        })
+    }
+
     handleChange = (event) => {
         const { name, value, type } = event.target;
         const { errors } = this.state;
         if (value.trim() === '') {
-            errors.commentTextBox = 'Comment is required*';
+            errors[name] = name +' is required*';
         } else {
-            errors.commentTextBox = '';
+            errors[name] = '';
         }
         this.setState({
             [name]: value,
@@ -66,17 +106,16 @@ export default class Comment extends React.Component {
     }
 
     submitComment = () => {
-        const { errors, commentTextBox, queryId } = this.state;
-        if (commentTextBox.trim() === '') {
-            errors.commentTextBox = 'Comment is required*';
-         
+        const { errors, comment, queryId } = this.state;
+        if (comment.trim() === '') {
+            errors.comment = 'Comment is required*';
             this.setState({
                 errors : errors
             });
             
         } else {
             const postArr = {
-                "Comment" : commentTextBox,
+                "Comment" : comment,
                 "CommentedBy" : user_id
             }
             Queries.give_comment(queryId,postArr).then(
@@ -89,14 +128,44 @@ export default class Comment extends React.Component {
                 }
             )
         }
-
     }
-    
+
+    submitReply = (commentId) => {
+        const { reply, queryId } = this.state;
+        if (reply.trim() !== '') {
+            const postArr = {
+                "Comment" : reply,
+                "CommentedBy" : user_id
+            }
+            Queries.give_comments_reply(queryId, commentId, postArr).then(
+                result => {
+                    if (result.Status === "Success") {
+                        this.props.successFun({successModalLabel : 'Reply Successfully !'});
+                        // eventsemit.replied_comment();
+                    } else {
+                        this.props.errorFun({errorModalLabel : result.Error.Message});
+                    }
+                }
+            )
+        }
+    }
+
     componentDidMount() {
         this.getComments();
     }
+
+    closeModal = () => {
+        this.setState({
+            modalOpen: false
+        });
+    }
+
     render() {
-        const { isLoaded, commentList, commentTextBox, errors } = this.state;
+        
+        // eventsemit.on('replied_comment', () => this.getComments());
+
+        const { isLoaded, commentList, replyList, comment, replyToComment, errors, showCommentReplys, showErrorModal, modalOpen, errorModalLabel, reply } = this.state;
+        let reply_arr = '';
         if (isLoaded === false) {
             return(<div>Loading...</div>);
         } 
@@ -106,55 +175,93 @@ export default class Comment extends React.Component {
                     <div className="comment-section-inner flex-box">
                         <div className="comment-user-img" style={{backgroundImage: "url('"+userDetails.Image+"')"}}></div>
                         <div className="comment-field flex-box">
-                            <input id="commentTextBox" name="commentTextBox" type="text" placeholder="write your comment here..." defaultValue={commentTextBox} onChange={this.handleChange} />
+                            <input id="comment" name="comment" type="text" placeholder="write your comment here..." defaultValue={comment} onChange={this.handleChange} />
                             <div className="flex-box comment-option">
                                 <button type="button" className="post-comment-btn" onClick={this.submitComment}><i aria-hidden="true" className="fa fa-paper-plane"></i> Add Comment</button>
                             </div>
                         </div>
                     </div>
-                    {(errors.commentTextBox !== '') && <div className="errorBox"><span className='validation-msg'>{errors.commentTextBox}</span></div>}
+                    {(errors.comment !== '') && <div className="errorBox"><span className='validation-msg'>{errors.comment}</span></div>}
                 </div>
                 <div className="comments-list">
                     <div className="comments-list-inner">
-                        {commentList[0].replay !== '' && commentList[0].replay.map((comment, key) => (
+                        {commentList && commentList.map((comment, key) => (
                             <div key={key}>
-                                <div className="query-head d-flex">
-                                    {comment.UserDetails[0].image && comment.UserDetails[0].image !== '' &&
-                                        <span className="profile-img" style={{backgroundImage: "url('"+comment.UserDetails[0].image+"')"}}></span>
-                                    }
-                                    <div className="about-query-info">
-                                        <div className="small-title">{comment.UserDetails[0].FirstName} {comment.UserDetails[0].LastName} </div>
-                                        <div className="query-shared-by">{comment.Comment}</div>
-                                        <div className="reply-comment-box comment-field flex-box" style={{display: "none"}} id={"replybox_"+comment._id}>
-                                            <input type="text" placeholder="Reply comment..." id={"replyTextBox_"+comment._id} />
-                                            <div className="flex-box comment-option">
-                                                <button type="button" className="post-comment-btn"><i aria-hidden="true" className="fa fa-paper-plane"></i> Reply</button>
+                                <div className="queryItem"> 
+                                    <div className="query-head d-flex">
+                                        <span className="profile-img" style={{backgroundImage: (comment.UserDetails[0].Image && comment.UserDetails[0].Image) ? "url('"+comment.UserDetails[0].Image+"')" : "url('"+user_placeholder+"')"}}></span>
+                                        <div className="about-query-info">
+                                            <div className="small-title">{comment.UserDetails[0].FirstName} {comment.UserDetails[0].LastName} </div>
+                                            <div className="query-shared-by">{comment.Comment}</div>
+                                            <div className="reply-comment-box comment-field flex-box" style={{display: (replyToComment === comment._id) ? 'flex' : 'none' }} id={"replybox_"+comment._id}>
+                                                <input type="text" placeholder="Reply comment..." id={"replyTextBox_"+comment._id} name="reply" defaultValue={reply} onChange={this.handleChange}/>
+                                                <div className="flex-box comment-option">
+                                                    <button type="button" className="post-comment-btn" onClick={() => this.submitReply(comment._id)} name="submit"><i aria-hidden="true" className="fa fa-paper-plane"></i> Reply</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="comment-cta flex-box">
-                                            <div className="comment-react flex-box" id={"comment"+comment.Comment._id}>
-                                                <img src={like_outline_icon} className="outline-icon" />
-                                                <img src={like_fill_icon} className="fill-icon" />
-                                                <span className="likes">0</span>
-                                            </div>
-                                                
-                                            <div className="comment-react flex-box">
-                                                <span><img src={replay_arrow} /></span>
-                                                <span className="mobile-d-none"> Reply</span>
-                                            </div>
-                                            <div className="comment-react flex-box">
-                                                <span>
-                                                    <span><img src={view_reply_hover} /></span>
-                                                    <span className="mobile-d-none">View Replies</span>
-                                                </span>
+                                            <div className="comment-cta flex-box">
+                                                <div className="comment-react flex-box" id={"comment"+comment._id}>
+                                                    <img src={like_outline_icon} className="outline-icon" />
+                                                    <img src={like_fill_icon} className="fill-icon" />
+                                                    <span className="likes">{comment.Likes.length}</span>
+                                                </div>
+                                                    
+                                                <div className="comment-react flex-box">
+                                                    <span><img src={replay_arrow} /></span>
+                                                    <span className="mobile-d-none" onClick={() => this.handleReplyToComment(comment._id)}> Reply</span>
+                                                </div>
+                                                <div className="comment-react flex-box">
+                                                    <span>
+                                                        <span><img src={view_reply_hover} /></span>
+                                                        <span className="mobile-d-none" onClick={() => this.viewReply(comment.reply ? comment._id : '')}>View Replies</span>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                {(showCommentReplys.includes(comment._id) && comment.reply && comment.reply.length) && 
+                                    <div className="query_item_reply">
+                                        {comment.reply.map((reply, key) => (
+                                            <div className="queryItem" key={key}>
+                                                <div className="comments-list-inner replay-comment ng-star-inserted">
+                                                    <div className="query-head d-flex ng-star-inserted" style={{marginBottom: '0px'}}>
+                                                        <span className="profile-img" style={{backgroundImage: (reply.UserDetails[0].Image && reply.UserDetails[0].Image) ? "url('"+reply.UserDetails[0].Image+"')" : "url('"+user_placeholder+"')"}}></span>
+                                                        <div className="about-query-info">
+                                                            <div className="small-title">{reply.UserDetails[0].FirstName} {reply.UserDetails[0].LastName}</div>
+                                                            <div className="query-shared-by">{reply.Comment}</div>
+                                                            <div className="comment-cta flex-box">
+                                                                <div className="comment-react flex-box">
+                                                                    <img src={like_outline_icon} className="outline-icon" />
+                                                                    <img src={like_fill_icon} className="fill-icon" />
+                                                                    <span className="likes">{reply.Likes.length}</span>
+                                                                </div>
+                                                                <div className="comment-react flex-box delete-comment">
+                                                                    <span><img src={more_option} /></span>
+                                                                    <div className="report-pop">
+                                                                        <a>Delete</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                }
                             </div>
                         ))}
                     </div>
                 </div>
+                {showErrorModal === true &&
+                    <ErrorModal
+                        Label={errorModalLabel}
+                        modalOpen={modalOpen}
+                        handlerCloseModal={this.closeModal}
+                        yesOption={'OK'}
+                    ></ErrorModal>
+                }
             </div>
         )
     }
