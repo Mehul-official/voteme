@@ -157,3 +157,31 @@ export const likeordislike = (query, query_id) =>
     .then((res) => res.json())
     .then((result) => result)
     
+export const comment_likeordislike = (query, query_id, comment_id) => 
+    fetch(`${api}/${query_id}/comment/${comment_id}/likeordislike/`, { 
+        method: 'post',
+        headers: {
+            ...headers,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(query)
+    })
+    .then((res) => res.json())
+    .then((result) => result)
+
+// {
+    
+//     let xhr = new XMLHttpRequest();
+//     xhr.open('POST', `${api}/${query_id}/comment/${comment_id}/likeordislike/`);
+//     xhr.setRequestHeader("Accept", "application/json");
+//     xhr.setRequestHeader("Content-Type", "application/json");
+//     xhr.setRequestHeader("Authorization", "Bearer "+token);
+//     xhr.send(JSON.stringify(query));
+
+// }
+
+
+
+
+    

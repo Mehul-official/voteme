@@ -196,7 +196,10 @@ export default class QueryItem extends React.Component {
                                 <img style={{cursor: "pointer"}} src={Query.ThumbnailURL} />
                             </div>
                         }
-                        <h2 className="small-title"><Link style={{cursor: 'pointer'}} to={'/query-detail/'+Query._id}>{Query.Query}</Link></h2>
+                        {(this.props.component === "query-detail") ?
+                            <h2 className="small-title"><a style={{cursor: 'pointer'}}>{Query.Query}</a></h2>
+                        :    <h2 className="small-title"><Link style={{cursor: 'pointer'}} to={'/query-detail/'+Query._id}>{Query.Query}</Link></h2>
+                        }
                     </div>
                     {(this.props.component === "query-detail") ? 
                         <div className="query-chart">

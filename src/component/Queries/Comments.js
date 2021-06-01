@@ -10,8 +10,8 @@ import more_option from '../../assets/images/more.png';
 
 import { ErrorModal } from '../common/Modal';
 
-// const Eventsemit = require('../Eventsemitor');
-// const eventsemit = new Eventsemit();
+const Eventsemit = require('../Eventsemitor');
+const eventsemit = new Eventsemit();
 
 const userDetails = User.userDetails;
 const user_id = userDetails._id;
@@ -28,9 +28,9 @@ export default class Comment extends React.Component {
             Rows : 30,
             comment : '',
             showCommentReplys: [],
+            likesOfComments : [],
             reply : '',
             replyToComment : '',
-            showErrorModal : false,
             modalOpen : false,
             errorModalLabel : '',
             errors : {
@@ -40,8 +40,8 @@ export default class Comment extends React.Component {
     }
 
     getComments = (params = '') => {
-        const { queryId } = this.state;
-        console.log('queryId', queryId)
+        const { queryId, likesOfComments } = this.state;
+        
         var queryParams = {
             Rows : this.state.Rows,
             PageNo : this.state.Page,
@@ -58,12 +58,23 @@ export default class Comment extends React.Component {
                     let commentList = (result.Data.length && result.Data[0].Records.length) ? result.Data[0].Records.slice(0, 1)[0].replay : '';
                     let replyList = (result.Data.length && result.Data[0].Records[1]) ? result.Data[0].Records.slice(1, result.Data[0].Records.length) : '';
                     
-                    commentList.map(comment => {
-                        replyList.map(reply => reply._id === comment._id && (comment.reply = reply.replay)).filter(v => v);
+                    commentList.length > 0 && commentList.map(comment => {
+                        comment.Like === true && likesOfComments.push(comment._id); 
+                        replyList.map(reply => {
+                            if (reply._id === comment._id) {
+                                comment.reply = reply.replay;
+                                reply.replay.map(rep => {
+                                    rep.Like === true && likesOfComments.push(rep._id);
+                                });
+                            };
+                        });
                     });
 
                     this.setState({
                         isLoaded : true,
+                        reply : '',
+                        comment : '',
+                        likesOfComments : likesOfComments,
                         commentList : commentList,
                         replyList : replyList,
                     });
@@ -78,13 +89,10 @@ export default class Comment extends React.Component {
                 showCommentReplys : [...this.state.showCommentReplys, id]
             })            
         } else {
-            this.setState({
-                showErrorModal : true,
-                modalOpen : true,
-                errorModalLabel : 'No REPLIES are there for this COMMENT!',
-            })
+            this.props.errorFun({errorModalLabel : 'No REPLIES are there for this COMMENT!'});
         }
     }
+
     handleReplyToComment = (id) => {
         this.setState({
             replyToComment : id
@@ -122,12 +130,27 @@ export default class Comment extends React.Component {
                 result => {
                     if (result.Status === "Success") {
                         this.props.successFun({successModalLabel : 'Comment Applied !'});
+                        eventsemit.replied_comment();
                     } else {
                         this.props.errorFun({errorModalLabel : result.Error.Message});
                     }
                 }
             )
         }
+    }
+
+    actionButton = (_id, action) => {
+        const { queryId } = this.state;
+        action = action === 'like' ? true : false;
+
+        Queries.comment_likeordislike({
+            "Like" : action,
+            "LikedBy" : user_id
+        }, queryId, _id).then(
+            result => {
+                this.getComments();
+            }
+        )
     }
 
     submitReply = (commentId) => {
@@ -141,7 +164,7 @@ export default class Comment extends React.Component {
                 result => {
                     if (result.Status === "Success") {
                         this.props.successFun({successModalLabel : 'Reply Successfully !'});
-                        // eventsemit.replied_comment();
+                        eventsemit.replied_comment();
                     } else {
                         this.props.errorFun({errorModalLabel : result.Error.Message});
                     }
@@ -162,9 +185,9 @@ export default class Comment extends React.Component {
 
     render() {
         
-        // eventsemit.on('replied_comment', () => this.getComments());
+        eventsemit.on('replied_comment', () => this.getComments());
 
-        const { isLoaded, commentList, replyList, comment, replyToComment, errors, showCommentReplys, showErrorModal, modalOpen, errorModalLabel, reply } = this.state;
+        const { isLoaded, commentList, replyList, comment, replyToComment, errors, showCommentReplys, modalOpen, errorModalLabel, reply, likesOfComments } = this.state;
         let reply_arr = '';
         if (isLoaded === false) {
             return(<div>Loading...</div>);
@@ -200,10 +223,10 @@ export default class Comment extends React.Component {
                                                 </div>
                                             </div>
                                             <div className="comment-cta flex-box">
-                                                <div className="comment-react flex-box" id={"comment"+comment._id}>
+                                                <div className={"comment-react flex-box " + (comment.Like && "icon-fill") } id={"comment"+comment._id} onClick={() => this.actionButton(comment._id, comment.Like ? 'dislike' : 'like')}>
                                                     <img src={like_outline_icon} className="outline-icon" />
                                                     <img src={like_fill_icon} className="fill-icon" />
-                                                    <span className="likes">{comment.Likes.length}</span>
+                                                    <span className="likes">{comment.Likes.length} </span>
                                                 </div>
                                                     
                                                 <div className="comment-react flex-box">
@@ -231,7 +254,7 @@ export default class Comment extends React.Component {
                                                             <div className="small-title">{reply.UserDetails[0].FirstName} {reply.UserDetails[0].LastName}</div>
                                                             <div className="query-shared-by">{reply.Comment}</div>
                                                             <div className="comment-cta flex-box">
-                                                                <div className="comment-react flex-box">
+                                                                <div className={"comment-react flex-box " + (reply.Like && "icon-fill")} onClick={() => this.actionButton(reply._id, reply.Like ? 'dislike' : 'like')}>
                                                                     <img src={like_outline_icon} className="outline-icon" />
                                                                     <img src={like_fill_icon} className="fill-icon" />
                                                                     <span className="likes">{reply.Likes.length}</span>
@@ -254,14 +277,6 @@ export default class Comment extends React.Component {
                         ))}
                     </div>
                 </div>
-                {showErrorModal === true &&
-                    <ErrorModal
-                        Label={errorModalLabel}
-                        modalOpen={modalOpen}
-                        handlerCloseModal={this.closeModal}
-                        yesOption={'OK'}
-                    ></ErrorModal>
-                }
             </div>
         )
     }
